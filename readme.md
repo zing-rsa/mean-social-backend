@@ -1,7 +1,16 @@
+
+## Mean-social-backend
+
+Sandbox social-media model to practice full stack application design. Implements MEAN stack, and demonstrates functionality such as user authentication, profile management, user interactions and admin tools.
+
+Front-end at: [mean-social-frontend](https://github.com/zing-rsa/mean-social-frontend)
+
+---
+
 # Backend approach:
 
 ## Endpoint map:
----
+
 ### <u>users</u>:
 
 `/users: get`
@@ -54,8 +63,6 @@
 `/unfollow: post`
 
 `/login: post`
-
----
 
 ## DB schema: 
 
