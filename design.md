@@ -25,6 +25,7 @@
     - all data
     - pictures
 
+
 ### <u>posts</u>
 
 `/posts/create: post`
@@ -45,13 +46,15 @@
 `/comments/delete: delete - (admin or owner)`
 - delete comment
 
-### <u>misc</u>
+### <u>follows</u>:
 
-`/follow: post`
+`/follows/follow: post`
 
-`/unfollow: post`
+`/follows/unfollow: delete`
 
-`/login: post`
+### <u>auth</u>
+
+`/auth/login: post`
 
 ## DB schema: 
 
