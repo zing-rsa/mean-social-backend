@@ -1,10 +1,17 @@
-const config = require('./config')
-const express = require('express')
+const config = require('./config');
+const express = require('express');
 const app = module.exports = express();
+const db_conn = require('./db');
 
-app.use('/api', require('./api'))
+async function start() {
 
-app.listen(config.express.port, function () {
-    console.log(`App listening on port ${config.express.port}!`)
-})
-  
+    await db_conn.init();
+
+    app.use('/api', require('./api'));
+
+    app.listen(config.express.port, function () {
+        console.log(`App listening on port ${config.express.port}!`);
+    });
+}
+
+start();
