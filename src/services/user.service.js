@@ -1,25 +1,24 @@
+const { date } = require('joi');
+
 const db = require('../mongo').db()
 
-class UserService {
+let users = db.collection('users');
 
-    users = null;
-
-    constructor() {
-        this.users = db.collection('users');
-    }
-
-    async getUsers() {
-        return await this.users.find().toArray(); // use projection
-    }
-
-    async getUser(username){
-        query = { username: username }
-        return await this.users.find(query).toArray(); // user projection
-    }
-
-    async createUser(data){
-        return { "name": data.name }
-    }
+const getUsers = async () => {
+    return await users.find().toArray(); // use projection
 }
 
-module.exports = new UserService();
+const getUser = async (username) => {
+    query = { username: username }
+    return await users.find(query).toArray(); // use projection
+}
+
+const createUser = async (data) => {
+    return { "name": data.name }
+}
+
+module.exports = {
+    getUsers,
+    getUser,
+    createUser
+}
