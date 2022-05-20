@@ -1,4 +1,7 @@
-var router = require('express').Router();
+const express = require('express');
+const router = express.Router();
+
+router.use(express.json())
 
 router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");

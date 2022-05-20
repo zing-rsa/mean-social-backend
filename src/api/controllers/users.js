@@ -1,18 +1,48 @@
 const UserService = require('../../services/user.service')
-var router = require('express').Router();
+const Joi = require('joi')
+const router = require('express').Router();
 
 
 async function all(req, res) {
     console.log('users/');
-    //res.status(200).send();
 
-    users = UserService.getUsers()
+    users = await UserService.getUsers();
     res.status(200).json(users).send();
+}
+
+async function user(req, res) {
+    console.log('users/:username');
+
+    const schema = Joi.string()
+    const { error, value } = schema.validate(req.query.username)
+
+    if (error) {
+        res.status(400).send();
+    } else {
+        user = await UserService.getUser(value);
+        res.status(200).json(user).send();
+    }
 }
 
 async function signup(req, res) {
     console.log('users/signup');
-    res.status(200).send();
+
+    const schema = Joi.object().keys({
+        name: Joi.string().pattern(/^[a-zA-Z]+$/).required(),
+        surname: Joi.string().pattern(/^[a-zA-Z]+$/).required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().min(5).max(16).alphanum().required()
+    });
+
+    const { error, value } = schema.validate(req.body)
+
+    if (error) {
+        message = { 'message': error.details[0].message }
+        res.status(400).json(message).send();
+    } else {
+        user = await UserService.createUser(value)
+        res.status(200).json(user).send();
+    }
 }
 
 async function edit(req, res) {
@@ -25,15 +55,11 @@ async function del(req, res) {
     res.status(200).send();
 }
 
-async function user(req, res) {
-    console.log('users/:username');
-    res.status(200).send();
-}
 
 router.get('/', all);
+router.get('/:username', user);
 router.post('/signup', signup);
 router.put('/edit', edit);
 router.delete('/delete', del);
-router.get('/:username', user);
 
 module.exports = router
