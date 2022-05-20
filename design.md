@@ -11,9 +11,6 @@
     - names
     - pics
 
-`/users/signup: post`
-- create user
-
 `/users/edit: put`
 - edit user info
 
@@ -53,6 +50,9 @@
 `/follows/unfollow: delete`
 
 ### <u>auth</u>
+
+`/auth/signup: post`
+- create user
 
 `/auth/login: post`
 

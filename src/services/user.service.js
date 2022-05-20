@@ -1,5 +1,3 @@
-const { date } = require('joi');
-
 const db = require('../mongo').db()
 
 let users = db.collection('users');
@@ -13,12 +11,7 @@ const getUser = async (username) => {
     return await users.find(query).toArray(); // use projection
 }
 
-const createUser = async (data) => {
-    return { "name": data.name }
-}
-
 module.exports = {
     getUsers,
-    getUser,
-    createUser
+    getUser
 }
