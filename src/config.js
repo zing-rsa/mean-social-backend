@@ -7,3 +7,5 @@ config.express = {
 config.env = process.env.EXPRESS_ENV || 'dev';
 
 config.mongoUrl = process.env.MONGO_URL;
+
+config.db_name = 'mean-social'

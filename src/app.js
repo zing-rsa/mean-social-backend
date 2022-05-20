@@ -1,13 +1,16 @@
 const config = require('./config');
 const express = require('express');
+const mongo = require('./mongo');
 const app = module.exports = express();
-const db_conn = require('./db');
 
 async function start() {
 
-    await db_conn.init();
+    try {
+        await mongo.connect();
+    } catch (error) {
+        process.exit() //for now
+    }
     
-    // app.use(express.json())
     app.use('/api', require('./api'));
 
     app.listen(config.express.port, function () {
