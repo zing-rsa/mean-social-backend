@@ -13,13 +13,17 @@ async function user(req, res) {
     console.log('users/:username');
 
     const schema = Joi.string()
-    const { error, value } = schema.validate(req.query.username)
+    const { error, value } = schema.validate(req.params.username)
 
     if (error) {
         res.status(400).send();
     } else {
-        user = await UserService.getUser(value);
-        res.status(200).json(user).send();
+        try {
+            user = await UserService.getUser(value);
+            res.status(200).json(user).send();
+        } catch (error) {
+            
+        }
     }
 }
 

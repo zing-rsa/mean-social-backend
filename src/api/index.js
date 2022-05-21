@@ -4,11 +4,9 @@ const auth = require('../middleware/auth')
 const unless = require('../util').unless
 
 router.use(express.json())
-router.use(unless(auth, '/auth/login', '/auth/signup'))
-
+// router.use(unless(auth, '/auth/login', '/auth/signup'))
 router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    // res.setHeader('Content-Type', 'application/json');
     next();
 });
 

@@ -1,7 +1,8 @@
+const { SignupError, ValidationError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 
-const Joi = require('joi')
+const Joi = require('joi');
 
 async function signup(req, res) {
     console.log('auth/signup');
@@ -14,15 +15,21 @@ async function signup(req, res) {
         bio: Joi.string().max(200).default('')
     });
 
-    const { error, value } = schema.validate(req.body)
-
-    if (error) {
-        message = { 'message': error.details[0].message }
-        res.status(400).json(message).send();
-    } else {
+    try {
+        const { error, value } = schema.validate(req.body)
+        if (error) throw new ValidationError(error.details[0].message)
 
         user = await AuthService.createUser(value)
         res.status(200).json(user).send();
+
+    } catch (e) {
+        if (e instanceof ValidationError){
+            res.status(400).json({message: e.message}).send();
+        } else if (e instanceof SignupError){
+            res.status(400).json({message: e.message}).send();
+        } else {
+            res.status(500).json({message: "Unknown error"}).send()
+        }
     }
 }
 
