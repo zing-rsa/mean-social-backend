@@ -18,8 +18,8 @@ async function signup(req, res) {
         const { error, value } = schema.validate(req.body);
         if (error) throw new ValidationError(error.details[0].message);
 
-        user = await AuthService.createUser(value);
-        return res.status(200).json(user).send();
+        let user = await AuthService.createUser(value);
+        return res.status(201).json(user).send();
 
     } catch (e) {
         if (e instanceof ValidationError) {
@@ -40,12 +40,12 @@ async function login(req, res) {
         email: Joi.string().email().required(),
         pass: Joi.string().alphanum().required()
     });
-
+    
     try {
         const { error, value } = schema.validate(req.body);
         if (error) throw new ValidationError(error.details[0].message);
 
-        user = await AuthService.login(value);
+        let user = await AuthService.login(value);
         return res.status(200).json(user).send();
 
     } catch (e) {

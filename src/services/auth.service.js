@@ -8,15 +8,15 @@ const bcrypt = require('bcrypt')
 let users = db.collection('users');
 
 const createUser = async (user) => {
-    var new_user = new User(user);
+    let new_user = new User(user);
 
-    var existing_user = await users.findOne({ email: user.email })
+    let existing_user = await users.findOne({ email: user.email })
     if (existing_user) throw new SignupError('Email already used')
 
     const salt = await bcrypt.genSalt(10);
     const pass = await bcrypt.hash(user.pass, salt);
 
-    var inserted_user = await users.insertOne({ ...new_user, pass: pass })
+    let inserted_user = await users.insertOne({ ...new_user, pass: pass })
 
     const token = jwt.sign(
         { id: inserted_user.insertedId.toHexString() },
@@ -32,9 +32,9 @@ const createUser = async (user) => {
 }
 
 const login = async (user_creds) => {
-    var query = { email: user_creds.email };
+    const query = { email: user_creds.email };
 
-    var existing_user = await users.findOne(query);
+    let existing_user = await users.findOne(query);
     if (!existing_user) throw new LoginError('User does not exist');
 
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);

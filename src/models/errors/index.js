@@ -16,8 +16,15 @@ class LoginError extends Error{
     }
 }
 
+class UpdateError extends Error{
+    constructor(message){
+        super(message)
+    }
+}
+
 module.exports = {
     SignupError,
     LoginError,
-    ValidationError
+    ValidationError,
+    UpdateError
 }

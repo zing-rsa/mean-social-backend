@@ -1,4 +1,4 @@
-var router = require('express').Router();
+router = require('express').Router();
 
 async function create(req, res) {
     console.log('comments/create');
