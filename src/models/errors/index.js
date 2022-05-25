@@ -10,7 +10,14 @@ class ValidationError extends Error{
     }
 }
 
+class LoginError extends Error{
+    constructor(message){
+        super(message)
+    }
+}
+
 module.exports = {
     SignupError,
+    LoginError,
     ValidationError
 }

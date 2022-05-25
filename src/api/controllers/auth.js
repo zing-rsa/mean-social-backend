@@ -1,7 +1,6 @@
-const { SignupError, ValidationError } = require('../../models/errors');
+const { SignupError, ValidationError, LoginError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
-
 const Joi = require('joi');
 
 async function signup(req, res) {
@@ -16,26 +15,48 @@ async function signup(req, res) {
     });
 
     try {
-        const { error, value } = schema.validate(req.body)
-        if (error) throw new ValidationError(error.details[0].message)
+        const { error, value } = schema.validate(req.body);
+        if (error) throw new ValidationError(error.details[0].message);
 
-        user = await AuthService.createUser(value)
-        res.status(200).json(user).send();
+        user = await AuthService.createUser(value);
+        return res.status(200).json(user).send();
 
     } catch (e) {
-        if (e instanceof ValidationError){
-            res.status(400).json({message: e.message}).send();
-        } else if (e instanceof SignupError){
-            res.status(400).json({message: e.message}).send();
-        } else {
-            res.status(500).json({message: "Unknown error"}).send()
+        if (e instanceof ValidationError) {
+            return res.status(400).json({ message: e.message }).send();
         }
+        if (e instanceof SignupError) {
+            return res.status(400).json({ message: e.message }).send(); //check code
+        }
+
+        return res.status(500).json({ message: "Unknown error" }).send();
     }
 }
 
 async function login(req, res) {
     console.log('/auth/login');
-    res.status(200).send();
+
+    const schema = Joi.object().keys({
+        email: Joi.string().email().required(),
+        pass: Joi.string().alphanum().required()
+    });
+
+    try {
+        const { error, value } = schema.validate(req.body);
+        if (error) throw new ValidationError(error.details[0].message);
+
+        user = await AuthService.login(value);
+        return res.status(200).json(user).send();
+
+    } catch (e) {
+        if (e instanceof ValidationError) {
+            return res.status(400).json({ message: e.message }).send();
+        }
+        if (e instanceof LoginError) {
+            return res.status(401).json({ message: e.message }).send();
+        }
+        return res.status(500).json({ message: "Unknown error" }).send();
+    }
 }
 
 router.post('/login', login);
