@@ -5,7 +5,7 @@ const Joi = require('joi');
 
 async function all(req, res) {
     console.log('users/');
-    
+
     try {
         let users = await UserService.getUsers();
         res.status(200).json(users).send();
@@ -15,29 +15,31 @@ async function all(req, res) {
 }
 
 async function user(req, res) {
-    console.log('users/:username');
+    console.log('users/:_id');
 
-    const schema = Joi.string();
+    const user_id = req.params._id
+    const schema = Joi.string().alphanum();
 
     try {
-        const { error, value } = schema.validate(req.params.username);
+        const { error, value } = schema.validate(user_id);
         if (error) throw new ValidationError(error.details[0].message)
 
         let user = await UserService.getUser(value);
         res.status(200).json(user).send();
-    } catch (error) {
+    } catch (e) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message })
         }
         return res.status(500).json({ message: 'Unknown error' })
     }
-
 }
 
 async function edit(req, res) {
     console.log('users/edit');
 
+    const user_creds = req.body;
     const schema = Joi.object().keys({
+        _id: Joi.string().alphanum().required(),
         name: Joi.string().pattern(/^[a-zA-Z]+$/),
         surname: Joi.string().pattern(/^[a-zA-Z]+$/),
         email: Joi.string().email(),
@@ -47,18 +49,18 @@ async function edit(req, res) {
 
     try {
 
-        const { error, value } = schema.validate(req.body);
+        const { error, value } = schema.validate(user_creds);
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await UserService.editUser(value);
         return res.status(200).json(user).send();
 
     } catch (e) {
-        if (e instanceof ValidationError){
-            return res.status(400).json({message: e.message}).send();
-        } 
-        if (e instanceof UpdateError){
-            return res.status(400).json({message: e.message}).send();
+        if (e instanceof ValidationError) {
+            return res.status(400).json({ message: e.message }).send();
+        }
+        if (e instanceof UpdateError) {
+            return res.status(400).json({ message: e.message }).send();
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
@@ -67,12 +69,12 @@ async function edit(req, res) {
 async function del(req, res) {
     console.log('users/delete');
 
-    const schema = Joi.string();
+    const user_id = req.body._id;
+    const schema = Joi.string().alphanum();
 
     try {
+        const { error, value } = schema.validate(user_id);
 
-        const { error, value } = schema.validate(req.body.email)
-        
     } catch (e) {
         return res.status(500).json({ message: 'Unknown error' })
     }
@@ -80,7 +82,7 @@ async function del(req, res) {
 
 
 router.get('/', all);
-router.get('/:username', user);
+router.get('/:_id', user);
 router.put('/edit', edit);
 router.delete('/delete', del);
 

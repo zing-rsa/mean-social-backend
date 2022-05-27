@@ -1,5 +1,5 @@
 const { SignupError, LoginError } = require('../models/errors')
-const User = require('../models/user')
+const { User, UserMapper } = require('../models/user')
 const config = require('../config')
 const jwt = require('jsonwebtoken')
 const db = require('../mongo').db()
@@ -7,28 +7,29 @@ const bcrypt = require('bcrypt')
 
 let users = db.collection('users');
 
-const createUser = async (user) => {
-    let new_user = new User(user);
+const createUser = async (user_creds) => {
+    let new_user = new UserMapper(user_creds);
 
-    let existing_user = await users.findOne({ email: user.email })
+    let existing_user = await users.findOne({ email: new_user.email })
     if (existing_user) throw new SignupError('Email already used')
 
     const salt = await bcrypt.genSalt(10);
-    const pass = await bcrypt.hash(user.pass, salt);
+    new_user.pass = await bcrypt.hash(new_user.pass, salt);
 
-    let inserted_user = await users.insertOne({ ...new_user, pass: pass })
+    let inserted_user = await users.insertOne(new_user)
 
     const token = jwt.sign(
-        { id: inserted_user.insertedId.toHexString() },
+        { _id: inserted_user.insertedId.toHexString() },
         config.jwt_secret,
         {
             expiresIn: "1m",
         }
     );
 
-    new_user.token = token;
+    output_user = new User(new_user)
+    output_user.token = token;
 
-    return new_user;
+    return output_user;
 }
 
 const login = async (user_creds) => {
@@ -41,7 +42,7 @@ const login = async (user_creds) => {
     if (!validPassword) throw new LoginError('Incorrect password');
 
     const token = jwt.sign(
-        { id: existing_user._id },
+        { _id: existing_user._id },
         config.jwt_secret,
         {
             expiresIn: "1m",
@@ -49,7 +50,6 @@ const login = async (user_creds) => {
     );
 
     existing_user = new User(existing_user)
-
     existing_user.token = token
 
     return existing_user
