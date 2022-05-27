@@ -22,9 +22,16 @@ class UpdateError extends Error{
     }
 }
 
+class DeletionError extends Error{
+    constructor(message){
+        super(message)
+    }
+}
+
 module.exports = {
     SignupError,
     LoginError,
     ValidationError,
-    UpdateError
+    UpdateError,
+    DeletionError
 }

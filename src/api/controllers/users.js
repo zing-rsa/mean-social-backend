@@ -1,5 +1,5 @@
 const UserService = require('../../services/user.service');
-const { ValidationError } = require('../../models/errors');
+const { ValidationError, UpdateError, DeletionError } = require('../../models/errors');
 const router = require('express').Router();
 const Joi = require('joi');
 
@@ -50,18 +50,28 @@ async function edit(req, res) {
         const { error, value } = schema.validate(req.body);
         if (error) throw new ValidationError(error.details[0].message);
 
-        let user = await UserService.edit(value);
+        let user = await UserService.editUser(value);
         return res.status(200).json(user).send();
 
     } catch (e) {
-        return res.status(500).json({ message: 'Unknown error' })
+        if (e instanceof ValidationError){
+            return res.status(400).json({message: e.message}).send();
+        } 
+        if (e instanceof UpdateError){
+            return res.status(400).json({message: e.message}).send();
+        }
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
 async function del(req, res) {
     console.log('users/delete');
 
+    const schema = Joi.string();
+
     try {
+
+        const { error, value } = schema.validate(req.body.email)
         
     } catch (e) {
         return res.status(500).json({ message: 'Unknown error' })
