@@ -27,14 +27,14 @@ const editUser = async (user_creds) => {
     if (!existing_user) throw new NotFoundError('User does not exist');
 
     let updated_user = new UserMapper(user_creds);
-    await users.update(query, { $set: updated_user });
+    await users.updateOne(query, { $set: updated_user });
 
     let output_user = new User(await users.findOne(query));
     return output_user;
 }
 
-const delUser = async (user_id) => {
-    const query = { _id: user_id };
+const delUser = async (user) => {
+    const query = { _id: user._id };
 
     let existing_user = await users.findOne(query);
     if (!existing_user) throw new NotFoundError('User does not exist');

@@ -15,6 +15,7 @@ const createUser = async (user_creds) => {
 
     const salt = await bcrypt.genSalt(10);
     new_user.pass = await bcrypt.hash(new_user.pass, salt);
+    new_user.roles = ['user'];
 
     let inserted_user = await users.insertOne(new_user)
 

@@ -1,10 +1,10 @@
-const { SignupError, ValidationError, NotFoundError } = require('../../models/errors');
+const { SignupError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 const Joi = require('joi');
 
 
-router.post('/login', login);
+router.post('/login',  login);
 router.post('/signup', signup);
 
 module.exports = router

@@ -1,13 +1,14 @@
 const { ValidationError, NotFoundError } = require('../../models/errors');
+const { authenticate, authorizeAll, authorizeAny } = require('../../middleware');
 const UserService = require('../../services/user.service');
 const router = require('express').Router();
 const Joi = require('joi');
 
 
-router.get('/', all);
-router.get('/:_id', user);
-router.put('/edit', edit);
-router.delete('/delete', del);
+router.get(   '/',       [authenticate                                  ], all);
+router.get(   '/:_id',   [authenticate                                  ], user);
+router.put(   '/edit',   [authenticate, authorizeAny(['admin', 'owner'])], edit);
+router.delete('/delete', [authenticate, authorizeAll(['admin'])         ], del );
 
 module.exports = router
 
@@ -81,11 +82,13 @@ async function edit(req, res) {
 async function del(req, res) {
     console.log('users/delete');
 
-    const user_id = req.body._id;
-    const schema = Joi.string().alphanum();
+    const user = req.body;
+    const schema = Joi.object().keys({
+        _id: Joi.string().alphanum().required()
+    });
 
     try {
-        const { error, value } = schema.validate(user_id, { escapeHtml: true });
+        const { error, value } = schema.validate(user, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         await UserService.delUser(value);
