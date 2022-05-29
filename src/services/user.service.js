@@ -12,19 +12,20 @@ const getUsers = async () => {
 
 const getUser = async (user_id) => {
     const query = { _id: ObjectId(user_id) };
-    const schema = { pass: 0 };
 
-    let user = await users.findOne(query).project(schema);
+    let user = await users.findOne(query);
     if (!user) throw new NotFoundError('User does not exist');
 
+    let output_user = new User(user);
+    return output_user;
 }
 
 const editUser = async (user_creds) => {
     const query = { _id: ObjectId(user_creds._id) };
-    
+
     let existing_user = await users.findOne(query);
     if (!existing_user) throw new NotFoundError('User does not exist');
-    
+
     let updated_user = new UserMapper(user_creds);
     await users.update(query, { $set: updated_user });
 
@@ -39,7 +40,7 @@ const delUser = async (user_id) => {
     if (!existing_user) throw new NotFoundError('User does not exist');
 
     await users.deleteOne(query);
-    
+
     return;
 }
 

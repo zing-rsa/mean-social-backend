@@ -15,7 +15,7 @@ async function signup(req, res) {
     });
 
     try {
-        const { error, value } = schema.validate(req.body, {escapeHtml: true});
+        const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.createUser(value);
@@ -40,9 +40,9 @@ async function login(req, res) {
         email: Joi.string().email().required(),
         pass: Joi.string().alphanum().required()
     });
-    
+
     try {
-        const { error, value } = schema.validate(req.body, {escapeHtml: true});
+        const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.login(value);
