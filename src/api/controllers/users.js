@@ -1,5 +1,5 @@
+const { ValidationError, NotFoundError } = require('../../models/errors');
 const UserService = require('../../services/user.service');
-const { ValidationError, UpdateError, DeletionError } = require('../../models/errors');
 const router = require('express').Router();
 const Joi = require('joi');
 
@@ -21,7 +21,7 @@ async function user(req, res) {
     const schema = Joi.string().alphanum();
 
     try {
-        const { error, value } = schema.validate(user_id);
+        const { error, value } = schema.validate(user_id, {escapeHtml: true});
         if (error) throw new ValidationError(error.details[0].message)
 
         let user = await UserService.getUser(value);
@@ -29,6 +29,9 @@ async function user(req, res) {
     } catch (e) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message })
+        }
+        if (e instanceof NotFoundError){
+            return res.status(404).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' })
     }
@@ -49,7 +52,7 @@ async function edit(req, res) {
 
     try {
 
-        const { error, value } = schema.validate(user_creds);
+        const { error, value } = schema.validate(user_creds, {escapeHtml: true});
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await UserService.editUser(value);
@@ -59,8 +62,8 @@ async function edit(req, res) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message }).send();
         }
-        if (e instanceof UpdateError) {
-            return res.status(400).json({ message: e.message }).send();
+        if (e instanceof NotFoundError){
+            return res.status(404).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
@@ -73,10 +76,17 @@ async function del(req, res) {
     const schema = Joi.string().alphanum();
 
     try {
-        const { error, value } = schema.validate(user_id);
+        const { error, value } = schema.validate(user_id, {escapeHtml: true});
+        if (error) throw new ValidationError(error.details[0].message);
+
+        await UserService.delUser(value);
+        return res.status(200).send();
 
     } catch (e) {
-        return res.status(500).json({ message: 'Unknown error' })
+        if (e instanceof NotFoundError){
+            return res.status(404).json({ message: e.message });
+        }
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 

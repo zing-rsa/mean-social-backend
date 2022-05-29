@@ -16,7 +16,7 @@ const connect = async () => {
             return _db;
     
         } catch (error) {
-            console.log("Failed to connect to MongoDB")
+            console.log('Failed to connect to MongoDB')
             return Promise.reject(error)
         }
     }

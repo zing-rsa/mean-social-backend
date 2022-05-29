@@ -1,4 +1,4 @@
-const { SignupError, ValidationError, LoginError } = require('../../models/errors');
+const { SignupError, ValidationError, NotFoundError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 const Joi = require('joi');
@@ -15,7 +15,7 @@ async function signup(req, res) {
     });
 
     try {
-        const { error, value } = schema.validate(req.body);
+        const { error, value } = schema.validate(req.body, {escapeHtml: true});
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.createUser(value);
@@ -26,10 +26,10 @@ async function signup(req, res) {
             return res.status(400).json({ message: e.message }).send();
         }
         if (e instanceof SignupError) {
-            return res.status(400).json({ message: e.message }).send(); //check code
+            return res.status(400).json({ message: e.message }).send(); // right code?
         }
 
-        return res.status(500).json({ message: "Unknown error" }).send();
+        return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
 
@@ -42,7 +42,7 @@ async function login(req, res) {
     });
     
     try {
-        const { error, value } = schema.validate(req.body);
+        const { error, value } = schema.validate(req.body, {escapeHtml: true});
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.login(value);
@@ -52,10 +52,13 @@ async function login(req, res) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message }).send();
         }
-        if (e instanceof LoginError) {
+        if (e instanceof AuthError) {
             return res.status(401).json({ message: e.message }).send();
         }
-        return res.status(500).json({ message: "Unknown error" }).send();
+        if (e instanceof NotFoundError) {
+            return res.status(404).json({ message: e.message }).send();
+        }
+        return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
 

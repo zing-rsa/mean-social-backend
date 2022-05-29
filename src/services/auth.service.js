@@ -1,4 +1,4 @@
-const { SignupError, LoginError } = require('../models/errors')
+const { SignupError, NotFoundError, AuthError } = require('../models/errors')
 const { User, UserMapper } = require('../models/user')
 const config = require('../config')
 const jwt = require('jsonwebtoken')
@@ -22,7 +22,7 @@ const createUser = async (user_creds) => {
         { _id: inserted_user.insertedId.toHexString() },
         config.jwt_secret,
         {
-            expiresIn: "1m",
+            expiresIn: '1m',
         }
     );
 
@@ -36,16 +36,16 @@ const login = async (user_creds) => {
     const query = { email: user_creds.email };
 
     let existing_user = await users.findOne(query);
-    if (!existing_user) throw new LoginError('User does not exist');
+    if (!existing_user) throw new NotFoundError('User not found');
 
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
-    if (!validPassword) throw new LoginError('Incorrect password');
+    if (!validPassword) throw new AuthError('Incorrect password');
 
     const token = jwt.sign(
         { _id: existing_user._id },
         config.jwt_secret,
         {
-            expiresIn: "1m",
+            expiresIn: '1m',
         }
     );
 

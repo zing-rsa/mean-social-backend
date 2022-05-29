@@ -1,37 +1,18 @@
-class SignupError extends Error{
-    constructor(message){
-        super(message)
-    }
-}
-
 class ValidationError extends Error{
-    constructor(message){
-        super(message)
-    }
 }
 
-class LoginError extends Error{
-    constructor(message){
-        super(message)
-    }
+class NotFoundError extends Error{
 }
 
-class UpdateError extends Error{
-    constructor(message){
-        super(message)
-    }
+class SignupError extends Error{
 }
 
-class DeletionError extends Error{
-    constructor(message){
-        super(message)
-    }
+class AuthError extends Error{
 }
 
 module.exports = {
-    SignupError,
-    LoginError,
     ValidationError,
-    UpdateError,
-    DeletionError
+    NotFoundError,
+    SignupError,
+    AuthError
 }
