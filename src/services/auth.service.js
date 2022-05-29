@@ -23,7 +23,7 @@ const createUser = async (user_creds) => {
         { _id: inserted_user.insertedId.toHexString() },
         config.jwt_secret,
         {
-            expiresIn: '1m',
+            expiresIn: '30m',
         }
     );
 
@@ -46,7 +46,7 @@ const login = async (user_creds) => {
         { _id: existing_user._id },
         config.jwt_secret,
         {
-            expiresIn: '1m',
+            expiresIn: '30m',
         }
     );
 

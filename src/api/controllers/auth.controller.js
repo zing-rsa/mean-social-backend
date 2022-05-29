@@ -12,7 +12,7 @@ module.exports = router
 
 async function signup(req, res) {
     console.log('auth/signup');
-
+    
     const schema = Joi.object().keys({
         name: Joi.string().min(1).pattern(/^[a-zA-Z]+$/).required(),
         surname: Joi.string().min(1).pattern(/^[a-zA-Z]+$/).required(),
@@ -20,8 +20,9 @@ async function signup(req, res) {
         pass: Joi.string().min(5).max(16).alphanum().required(),
         bio: Joi.string().max(200).default('')
     });
-
+    
     try {
+
         const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
@@ -49,6 +50,7 @@ async function login(req, res) {
     });
 
     try {
+
         const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 

@@ -5,10 +5,10 @@ const router = require('express').Router();
 const Joi = require('joi');
 
 
-router.get(   '/',       [authenticate                                  ], all);
-router.get(   '/:_id',   [authenticate                                  ], user);
-router.put(   '/edit',   [authenticate, authorizeAny(['admin', 'owner'])], edit);
-router.delete('/delete', [authenticate, authorizeAll(['admin'])         ], del );
+router.get('/', [authenticate], all);
+router.get('/:_id', [authenticate], user);
+router.put('/edit', [authenticate, authorizeAny(['admin', 'owner'])], edit);
+router.delete('/delete', [authenticate, authorizeAll(['admin'])], del);
 
 module.exports = router
 
@@ -27,10 +27,11 @@ async function all(req, res) {
 async function user(req, res) {
     console.log('users/:_id');
 
-    const user_id = req.params._id
     const schema = Joi.string().alphanum();
 
     try {
+        const user_id = req.params._id
+
         const { error, value } = schema.validate(user_id, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message)
 
@@ -50,7 +51,6 @@ async function user(req, res) {
 async function edit(req, res) {
     console.log('users/edit');
 
-    const user_creds = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().required(),
         name: Joi.string().pattern(/^[a-zA-Z]+$/),
@@ -61,6 +61,7 @@ async function edit(req, res) {
     });
 
     try {
+        const user_creds = req.body;
 
         const { error, value } = schema.validate(user_creds, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
@@ -82,12 +83,13 @@ async function edit(req, res) {
 async function del(req, res) {
     console.log('users/delete');
 
-    const user = req.body;
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().required()
     });
 
     try {
+        const user = req.body;
+
         const { error, value } = schema.validate(user, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 

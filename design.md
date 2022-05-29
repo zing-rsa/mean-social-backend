@@ -22,8 +22,11 @@
     - all data
     - pictures
 
-
 ### <u>posts</u>
+
+`/posts: get`
+- get all posts
+- maybe add pagination to this
 
 `/posts/create: post`
 - create post
