@@ -3,6 +3,13 @@ const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 const Joi = require('joi');
 
+
+router.post('/login', login);
+router.post('/signup', signup);
+
+module.exports = router
+
+
 async function signup(req, res) {
     console.log('auth/signup');
 
@@ -61,8 +68,3 @@ async function login(req, res) {
         return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
-
-router.post('/login', login);
-router.post('/signup', signup);
-
-module.exports = router

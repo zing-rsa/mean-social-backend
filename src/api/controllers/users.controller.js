@@ -3,6 +3,15 @@ const UserService = require('../../services/user.service');
 const router = require('express').Router();
 const Joi = require('joi');
 
+
+router.get('/', all);
+router.get('/:_id', user);
+router.put('/edit', edit);
+router.delete('/delete', del);
+
+module.exports = router
+
+
 async function all(req, res) {
     console.log('users/');
 
@@ -21,7 +30,7 @@ async function user(req, res) {
     const schema = Joi.string().alphanum();
 
     try {
-        const { error, value } = schema.validate(user_id, {escapeHtml: true});
+        const { error, value } = schema.validate(user_id, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message)
 
         let user = await UserService.getUser(value);
@@ -30,7 +39,7 @@ async function user(req, res) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message })
         }
-        if (e instanceof NotFoundError){
+        if (e instanceof NotFoundError) {
             return res.status(404).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' })
@@ -52,7 +61,7 @@ async function edit(req, res) {
 
     try {
 
-        const { error, value } = schema.validate(user_creds, {escapeHtml: true});
+        const { error, value } = schema.validate(user_creds, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await UserService.editUser(value);
@@ -62,7 +71,7 @@ async function edit(req, res) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message }).send();
         }
-        if (e instanceof NotFoundError){
+        if (e instanceof NotFoundError) {
             return res.status(404).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });
@@ -76,14 +85,14 @@ async function del(req, res) {
     const schema = Joi.string().alphanum();
 
     try {
-        const { error, value } = schema.validate(user_id, {escapeHtml: true});
+        const { error, value } = schema.validate(user_id, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         await UserService.delUser(value);
         return res.status(200).send();
 
     } catch (e) {
-        if (e instanceof NotFoundError){
+        if (e instanceof NotFoundError) {
             return res.status(404).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });
@@ -91,9 +100,3 @@ async function del(req, res) {
 }
 
 
-router.get('/', all);
-router.get('/:_id', user);
-router.put('/edit', edit);
-router.delete('/delete', del);
-
-module.exports = router
