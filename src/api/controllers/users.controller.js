@@ -1,17 +1,11 @@
-const { ValidationError, NotFoundError } = require('../../models/errors');
-const { authenticate, authorizeAll, authorizeAny } = require('../../middleware');
+const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
+const { authenticate, authorize } = require('../../middleware');
 const UserService = require('../../services/user.service');
 const router = require('express').Router();
 const Joi = require('joi');
 
 
 router.get('/', [authenticate], all);
-router.get('/:_id', [authenticate], user);
-router.put('/edit', [authenticate, authorizeAny(['admin', 'owner'])], edit);
-router.delete('/delete', [authenticate, authorizeAll(['admin'])], del);
-
-module.exports = router
-
 
 async function all(req, res) {
     console.log('users/');
@@ -20,9 +14,12 @@ async function all(req, res) {
         let users = await UserService.getUsers();
         res.status(200).json(users).send();
     } catch (e) {
-        return res.status(500).json({ message: 'Unknown error' })
+        return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
+
+
+router.get('/:_id', [authenticate], user);
 
 async function user(req, res) {
     console.log('users/:_id');
@@ -39,14 +36,17 @@ async function user(req, res) {
         res.status(200).json(user).send();
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message })
+            return res.status(400).json({ message: e.message }).send();
         }
         if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message });
+            return res.status(404).json({ message: e.message }).send();
         }
-        return res.status(500).json({ message: 'Unknown error' })
+        return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
+
+
+router.put('/edit', [authenticate], edit);
 
 async function edit(req, res) {
     console.log('users/edit');
@@ -62,11 +62,12 @@ async function edit(req, res) {
 
     try {
         const user_creds = req.body;
+        const current_user = req.user;
 
         const { error, value } = schema.validate(user_creds, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let user = await UserService.editUser(value);
+        let user = await UserService.editUser(value, current_user);
         return res.status(200).json(user).send();
 
     } catch (e) {
@@ -74,11 +75,17 @@ async function edit(req, res) {
             return res.status(400).json({ message: e.message }).send();
         }
         if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message });
+            return res.status(404).json({ message: e.message }).send();
         }
-        return res.status(500).json({ message: 'Unknown error' });
+        if (e instanceof AuthorizationError){
+            return res.status(403).json({ message: e.message }).send();
+        }
+        return res.status(500).json({ message: 'Unknown error' }).send();
     }
 }
+
+
+router.delete('/delete', [authenticate, authorize('admin')], del);
 
 async function del(req, res) {
     console.log('users/delete');
@@ -104,4 +111,4 @@ async function del(req, res) {
     }
 }
 
-
+module.exports = router

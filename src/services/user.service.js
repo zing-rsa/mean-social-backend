@@ -1,6 +1,6 @@
-const { NotFoundError } = require('../models/errors');
+const { NotFoundError, AuthorizationError } = require('../models/errors');
 const { User, UserMapper } = require('../models/user');
-const ObjectId = require('mongodb').ObjectId;
+const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
 let users = db.collection('users');
@@ -20,11 +20,15 @@ const getUser = async (user_id) => {
     return output_user;
 }
 
-const editUser = async (user_creds) => {
+const editUser = async (user_creds, current_user) => {
     const query = { _id: ObjectId(user_creds._id) };
 
     let existing_user = await users.findOne(query);
     if (!existing_user) throw new NotFoundError('User does not exist');
+
+    if (existing_user._id != current_user._id && !current_user.roles.includes('admin')) {
+        throw new AuthorizationError("Action not permitted");
+    }
 
     let updated_user = new UserMapper(user_creds);
     await users.updateOne(query, { $set: updated_user });

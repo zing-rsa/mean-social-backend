@@ -11,7 +11,7 @@
     - names
     - pics
 
-`/users/edit: put`
+`/users/edit: put` - (admin, owner)
 - edit user info
 
 `/users/delete: delete - (admin)`
@@ -28,7 +28,7 @@
 - get all posts
 - maybe add pagination to this
 
-`/posts/create: post`
+`/posts/create: post` - owner
 - create post
 
 `/posts/delete: delete - (admin or owner)`
@@ -81,6 +81,16 @@ _id | owner       | parent-post  | text                      | timestamp
 
 ### follow:
 ```
-user        | followee
+owner       | followee
 user._id    | user._id 
 ```
+
+#### pseudo authorize.mw:
+
+check owner:
+if put or delete
+    fetch document with req.body._id 
+                                        - what if no doc?
+                                        - how to know which type of doc(post, comment etc.)
+    if doc.owner = current_user._id
+        current_user.roles.push('owner')
