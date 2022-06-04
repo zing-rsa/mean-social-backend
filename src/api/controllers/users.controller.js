@@ -24,7 +24,7 @@ router.get('/:_id', [authenticate], user);
 async function user(req, res) {
     console.log('users/:_id');
 
-    const schema = Joi.string().alphanum();
+    const schema = Joi.string().alphanum().length(24);
 
     try {
         const user_id = req.params._id
@@ -52,7 +52,7 @@ async function edit(req, res) {
     console.log('users/edit');
 
     const schema = Joi.object().keys({
-        _id: Joi.string().alphanum().required(),
+        _id: Joi.string().alphanum().length(24).required(),
         name: Joi.string().pattern(/^[a-zA-Z]+$/),
         surname: Joi.string().pattern(/^[a-zA-Z]+$/),
         email: Joi.string().email(),
@@ -91,7 +91,7 @@ async function del(req, res) {
     console.log('users/delete');
 
     const schema = Joi.object().keys({
-        _id: Joi.string().alphanum().required()
+        _id: Joi.string().alphanum().length(24).required()
     });
 
     try {

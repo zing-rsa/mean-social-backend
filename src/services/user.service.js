@@ -26,7 +26,9 @@ const editUser = async (user_creds, current_user) => {
     let existing_user = await users.findOne(query);
     if (!existing_user) throw new NotFoundError('User does not exist');
 
-    if (existing_user._id != current_user._id && !current_user.roles.includes('admin')) {
+    // check for existing email
+
+    if (!existing_user._id.equals(current_user._id) && !current_user.roles.includes('admin')) {
         throw new AuthorizationError("Action not permitted");
     }
 

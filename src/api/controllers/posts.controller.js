@@ -24,7 +24,7 @@ router.get('/:_id', [authenticate], user_posts);
 
 async function user_posts(req, res) {
     console.log('posts/');
-    const schema = Joi.string();
+    const schema = Joi.string().length(24);
 
     try {
         const user_id = req.params._id;
@@ -49,18 +49,17 @@ async function create(req, res) {
     console.log('posts/create');
 
     const schema = Joi.object().keys({
-        text: Joi.string().required(),
-        owner: Joi.object()
+        text: Joi.string().required()
     });
 
     try {
-
-        const post_details = { ...req.body, owner: req.user._id };
+        const current_user = req.user;
+        const post_details = req.body;
 
         const { error, value } = schema.validate(post_details, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let post = await PostService.createPost(value);
+        let post = await PostService.createPost(value, current_user);
         return res.status(201).json(post).send();
 
     } catch (e) {
@@ -79,7 +78,7 @@ async function del(req, res) {
     console.log('posts/delete');
 
     const schema = Joi.object().keys({
-        _id: Joi.string().alphanum().required()
+        _id: Joi.string().alphanum().length(24).required()
     });
     
     try {

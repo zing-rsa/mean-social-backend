@@ -4,11 +4,12 @@ const db = require('../mongo').db();
 
 let posts = db.collection('posts');
 
-const createPost = async (post) => {
+const createPost = async (post, current_user) => {
 
     post = {
         ...post,
-        timestamp: new Date()
+        timestamp: new Date(),
+        owner: current_user._id
     }
 
     let inserted_post = await posts.insertOne(post);
