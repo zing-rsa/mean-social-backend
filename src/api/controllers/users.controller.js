@@ -1,4 +1,4 @@
-const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
+const { ValidationError, NotFoundError, AuthorizationError, ConflictError } = require('../../models/errors');
 const { authenticate, authorize } = require('../../middleware');
 const UserService = require('../../services/user.service');
 const router = require('express').Router();
@@ -77,8 +77,11 @@ async function edit(req, res) {
         if (e instanceof NotFoundError) {
             return res.status(404).json({ message: e.message }).send();
         }
-        if (e instanceof AuthorizationError){
+        if (e instanceof AuthorizationError) {
             return res.status(403).json({ message: e.message }).send();
+        }
+        if (e instanceof ConflictError) {
+            return res.status(409).json({ message: e.message }).send();
         }
         return res.status(500).json({ message: 'Unknown error' }).send();
     }

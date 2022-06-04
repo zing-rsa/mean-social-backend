@@ -4,7 +4,7 @@ class ValidationError extends Error{
 class NotFoundError extends Error{
 }
 
-class SignupError extends Error{
+class ConflictError extends Error{
 }
 
 class AuthError extends Error{
@@ -17,6 +17,6 @@ module.exports = {
     AuthorizationError,
     ValidationError,
     NotFoundError,
-    SignupError,
+    ConflictError,
     AuthError
 }

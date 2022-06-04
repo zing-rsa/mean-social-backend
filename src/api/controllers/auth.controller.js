@@ -1,4 +1,4 @@
-const { SignupError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
+const { ConflictError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 const Joi = require('joi');
@@ -33,8 +33,8 @@ async function signup(req, res) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message }).send();
         }
-        if (e instanceof SignupError) {
-            return res.status(400).json({ message: e.message }).send(); // right code?
+        if (e instanceof ConflictError) {
+            return res.status(409).json({ message: e.message }).send(); // right code?
         }
 
         return res.status(500).json({ message: 'Unknown error' }).send();

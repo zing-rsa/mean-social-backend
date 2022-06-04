@@ -1,4 +1,4 @@
-const { SignupError, NotFoundError, AuthError } = require('../models/errors')
+const { ConflictError, NotFoundError, AuthError } = require('../models/errors')
 const { User, UserMapper } = require('../models/user')
 const config = require('../config')
 const jwt = require('jsonwebtoken')
@@ -11,7 +11,7 @@ const createUser = async (user_creds) => {
     let new_user = new UserMapper(user_creds);
 
     let existing_user = await users.findOne({ email: new_user.email })
-    if (existing_user) throw new SignupError('Email already used')
+    if (existing_user) throw new ConflictError('Email already used')
 
     const salt = await bcrypt.genSalt(10);
     new_user.pass = await bcrypt.hash(new_user.pass, salt);
