@@ -10,4 +10,4 @@ config.mongoUrl = process.env.MONGO_URL;
 
 config.jwt_secret = process.env.JWT_SECRET
 
-config.db_name = 'mean-social'
+config.db_name = 'mean-social' // needs to change to mern

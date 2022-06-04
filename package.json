@@ -1,7 +1,7 @@
 {
-  "name": "mean-social-backend",
+  "name": "mern-social-backend",
   "version": "1.0.0",
-  "description": "Social-media model to practice full stack application design. Implements MEAN stack, and demonstrates functionality such as user authentication, sensitive data storage, profile management, user interactions and admin tools.",
+  "description": "Social-media model to practice full stack application design. Implements MERN stack, and demonstrates functionality such as user authentication, sensitive data storage, profile management, user interactions and admin tools.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zing-rsa/mean-social-backend.git"
+    "url": "git+https://github.com/zing-rsa/mern-social-backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zing-rsa/mean-social-backend/issues"
+    "url": "https://github.com/zing-rsa/mern-social-backend/issues"
   },
-  "homepage": "https://github.com/zing-rsa/mean-social-backend#readme",
+  "homepage": "https://github.com/zing-rsa/mern-social-backend#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "express": "^4.18.1",
