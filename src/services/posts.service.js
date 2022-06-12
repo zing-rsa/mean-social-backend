@@ -21,7 +21,40 @@ const createPost = async (post, current_user) => {
 }
 
 const getPosts = async () => {
-    return await posts.find({}).toArray();
+
+    const pipeline = [
+        {
+            '$lookup': {
+                'from': 'comments',
+                'localField': '_id',
+                'foreignField': 'parent',
+                'as': 'comments'
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'owner',
+                'foreignField': '_id',
+                'as': 'owner_details'
+            }
+        },
+        {
+            "$unwind": "$owner_details"
+        },
+        {
+            "$project": {
+                "owner_details.email": 0,
+                "owner_details.bio": 0,
+                "owner_details.pass": 0,
+                "owner_details.roles": 0
+            }
+        }
+    ]
+
+    const data = await posts.aggregate(pipeline).toArray();
+
+    return data;
 }
 
 const getUserPosts = async (user_id) => {
@@ -32,7 +65,7 @@ const getUserPosts = async (user_id) => {
 }
 
 const delPost = async (post, current_user) => {
-    const query = { _id: ObjectId(post._id)};
+    const query = { _id: ObjectId(post._id) };
 
     let existing_post = await posts.findOne(query);
     if (!existing_post) throw new NotFoundError('Post does not exist');
