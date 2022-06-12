@@ -27,17 +27,17 @@ async function signup(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.createUser(value);
-        return res.status(201).json(user).send();
+        return res.status(201).json(user);
 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
         if (e instanceof ConflictError) {
-            return res.status(409).json({ message: e.message }).send(); // right code?
+            return res.status(409).json({ message: e.message }); // right code?
         }
 
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
@@ -55,18 +55,18 @@ async function login(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.login(value);
-        return res.status(200).json(user).send();
+        return res.status(200).json(user);
 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
         if (e instanceof AuthError) {
-            return res.status(401).json({ message: e.message }).send();
+            return res.status(401).json({ message: e.message });
         }
         if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message }).send();
+            return res.status(404).json({ message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }

@@ -11,7 +11,7 @@ const authorize = (roles = []) => {
 
     for (let role of roles) {
       if (!user.roles.includes(role)) {
-        return res.status(403).json({ message: 'Unauthorized to perform this action' }).send();
+        return res.status(403).json({ message: 'Unauthorized to perform this action' });
       }
     }
 

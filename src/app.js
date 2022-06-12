@@ -1,7 +1,7 @@
-const config = require('./config');
 const express = require('express');
-const mongo = require('./mongo');
 const app = module.exports = express();
+const config = require('./config');
+const mongo = require('./mongo');
 
 async function start() {
 
@@ -10,7 +10,7 @@ async function start() {
     } catch (error) {
         process.exit() //for now
     }
-    
+
     app.use('/api', require('./api'));
 
     app.listen(config.express.port, function () {

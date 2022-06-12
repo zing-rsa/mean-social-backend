@@ -13,9 +13,9 @@ async function all(req, res) {
     
     try {
         let posts = await PostService.getPosts();
-        return res.status(200).json(posts).send();
+        return res.status(200).json(posts);
     } catch (e) {
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
@@ -33,12 +33,12 @@ async function user_posts(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let posts = await PostService.getUserPosts(value);
-        return res.status(200).json(posts).send();
+        return res.status(200).json(posts);
     } catch (e) {
         if (e instanceof ValidationError){
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
@@ -60,13 +60,13 @@ async function create(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let post = await PostService.createPost(value, current_user);
-        return res.status(201).json(post).send();
+        return res.status(201).json(post);
 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
@@ -89,15 +89,15 @@ async function del(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         await PostService.delPost(value, current_user);
-        return res.status(200).send();
+        return res.status(200);
     } catch(e) {
         if (e instanceof NotFoundError) {
-            return res.status(404).json({message: e.message }).send();
+            return res.status(404).json({message: e.message });
         }
         if (e instanceof AuthorizationError) {
-            return res.status(403).json({message: e.message }).send();
+            return res.status(403).json({message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 

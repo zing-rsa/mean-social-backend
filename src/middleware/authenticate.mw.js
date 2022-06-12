@@ -8,10 +8,10 @@ let users = db.collection('users');
 
 const authenticate = async (req, res, next) => {
   const token =
-    req.body.token || req.query.token || req.headers['x-access-token'];
+    req.body.token || req.query.token || req.headers['authorization'];
 
   if (!token) {
-    return res.status(403).json({ message: 'Token not included' }).send();
+    return res.status(403).json({ message: 'Token not included' });
   }
 
   try {
@@ -25,9 +25,9 @@ const authenticate = async (req, res, next) => {
     next();
   } catch (e) {
     if (e instanceof NotFoundError) {
-      return res.status(401).json({ message: e.message }).send();
+      return res.status(401).json({ message: e.message });
     }
-    return res.status(401).json({ message: 'Invalid Token' }).send();
+    return res.status(401).json({ message: 'Invalid Token' });
   }
 };
 

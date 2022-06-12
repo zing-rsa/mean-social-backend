@@ -23,19 +23,19 @@ async function follow(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let result = await FollowService.follow(value, current_user);
-        return res.status(200).json(result).send();
+        return res.status(200).json(result);
 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
         if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message }).send();
+            return res.status(404).json({ message: e.message });
         }
         if (e instanceof ConflictError) {
-            return res.status(409).json({ message: e.message }).send();
+            return res.status(409).json({ message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
@@ -55,19 +55,19 @@ async function unfollow(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         await FollowService.unfollow(value, current_user);
-        return res.status(200).send();
+        return res.status(200);
 
     } catch (e) {
         if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message }).send();
+            return res.status(400).json({ message: e.message });
         }
         if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message }).send();
+            return res.status(404).json({ message: e.message });
         }
         if (e instanceof ConflictError) {
-            return res.status(409).json({ message: e.message }).send();
+            return res.status(409).json({ message: e.message });
         }
-        return res.status(500).json({ message: 'Unknown error' }).send();
+        return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
