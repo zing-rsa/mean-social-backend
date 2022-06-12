@@ -1,7 +1,7 @@
 config = module.exports
 
 config.express = {
-  port: process.env.EXPRESS_PORT || 3000,
+  port: process.env.EXPRESS_PORT || 3080,
 }
 
 config.env = process.env.EXPRESS_ENV || 'dev';

@@ -8,7 +8,7 @@ let posts = db.collection('posts');
 const createComment = async (comment, current_user) => {
 
     comment = {
-        ...comment, 
+        ...comment,
         parent: ObjectId(comment.parent),
         timestamp: new Date(),
         owner: current_user._id
