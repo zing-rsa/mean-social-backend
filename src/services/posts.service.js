@@ -37,18 +37,18 @@ const getPosts = async () => {
                 'from': 'users',
                 'localField': 'owner',
                 'foreignField': '_id',
-                'as': 'owner_details'
+                'as': 'owner'
             }
         },
         {
-            "$unwind": "$owner_details"
+            "$unwind": "$owner"
         },
         {
             "$project": {
-                "owner_details.email": 0,
-                "owner_details.bio": 0,
-                "owner_details.pass": 0,
-                "owner_details.roles": 0
+                "owner.email": 0,
+                "owner.bio": 0,
+                "owner.pass": 0,
+                "owner.roles": 0
             }
         }
     ]
@@ -79,18 +79,18 @@ const getUserPosts = async (user_id) => {
                 'from': 'users',
                 'localField': 'owner',
                 'foreignField': '_id',
-                'as': 'owner_details'
+                'as': 'owner'
             }
         },
         {
-            "$unwind": "$owner_details"
+            "$unwind": "$owner"
         },
         {
             "$project": {
-                "owner_details.email": 0,
-                "owner_details.bio": 0,
-                "owner_details.pass": 0,
-                "owner_details.roles": 0
+                "owner.email": 0,
+                "owner.bio": 0,
+                "owner.pass": 0,
+                "owner.roles": 0
             }
         }
     ]
