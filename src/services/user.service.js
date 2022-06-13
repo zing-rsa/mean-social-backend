@@ -9,18 +9,50 @@ let comments = db.collection('comments');
 let follows = db.collection('follows');
 
 const getUsers = async () => {
-    const schema = { pass: 0 };
     return await users.find({}).project(schema).toArray();
 }
 
 const getUser = async (user_id) => {
-    const query = { _id: ObjectId(user_id) };
 
-    let user = await users.findOne(query);
+    const pipeline = [
+        {
+            '$match': {
+                _id: ObjectId(user_id)
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'follows',
+                'localField': '_id',
+                'foreignField': 'owner',
+                'as': 'following'
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'follows',
+                'localField': '_id',
+                'foreignField': 'followee',
+                'as': 'followers'
+            }
+        },
+        {
+            '$project': {
+                pass: 0,
+            }
+        }
+    ]
+
+    let user = (await users.aggregate(pipeline).toArray())[0] || null;
     if (!user) throw new NotFoundError('User does not exist');
 
-    let output_user = new User(user);
-    return output_user;
+    user = {
+        ...user,
+        followers: user.followers.length,
+        following: user.following.length
+    }
+
+    return user;
 }
 
 const editUser = async (user_creds, current_user) => {

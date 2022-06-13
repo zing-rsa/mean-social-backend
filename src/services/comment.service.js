@@ -7,11 +7,18 @@ let posts = db.collection('posts');
 
 const createComment = async (comment, current_user) => {
 
+    let {_id, name, surname, username } = current_user;
+
     comment = {
         ...comment,
         parent: ObjectId(comment.parent),
         timestamp: new Date(),
-        owner: current_user._id
+        owner: {
+            _id: _id,
+            name: name, 
+            surname: surname,
+            username: username
+        } // embed for ease for now
     }
 
     let parent = await posts.findOne({ _id: comment.parent});

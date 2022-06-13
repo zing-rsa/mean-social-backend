@@ -66,11 +66,6 @@ async function del(req, res) {
         }
         return res.status(500).json({ message: "Unknown error" });
     }
-
-
-
-    console.log('comments/delete');
-    res.status(200);
 }
 
 

@@ -3,6 +3,7 @@ const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
 let posts = db.collection('posts');
+let comments = db.collection('comments');
 
 const createPost = async (post, current_user) => {
 
@@ -100,16 +101,20 @@ const getUserPosts = async (user_id) => {
 }
 
 const delPost = async (post, current_user) => {
-    const query = { _id: ObjectId(post._id) };
 
-    let existing_post = await posts.findOne(query);
+    const post_query = { _id: ObjectId(post._id) }
+    const comment_query = { parent: ObjectId(post._id) }
+
+    let existing_post = await posts.findOne(post_query);
     if (!existing_post) throw new NotFoundError('Post does not exist');
 
     if (!existing_post.owner.equals(current_user._id) && !current_user.roles.includes('admin')) {
         throw new AuthorizationError("Action not permitted");
     }
 
-    await posts.deleteOne(query);
+    await comments.deleteMany(comment_query);
+    await posts.deleteOne(post_query);
+
     return;
 }
 
