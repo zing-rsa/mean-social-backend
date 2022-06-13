@@ -58,9 +58,44 @@ const getPosts = async () => {
 }
 
 const getUserPosts = async (user_id) => {
-    const query = { owner: ObjectId(user_id) }
 
-    let user_posts = await posts.find(query).toArray();
+    const pipeline = [
+        {
+            '$match': {
+                owner: ObjectId(user_id)
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'comments',
+                'localField': '_id',
+                'foreignField': 'parent',
+                'as': 'comments'
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'owner',
+                'foreignField': '_id',
+                'as': 'owner_details'
+            }
+        },
+        {
+            "$unwind": "$owner_details"
+        },
+        {
+            "$project": {
+                "owner_details.email": 0,
+                "owner_details.bio": 0,
+                "owner_details.pass": 0,
+                "owner_details.roles": 0
+            }
+        }
+    ]
+
+    let user_posts = await posts.aggregate(pipeline).toArray();
+    
     return user_posts;
 }
 
