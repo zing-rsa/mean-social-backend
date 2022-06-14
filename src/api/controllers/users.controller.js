@@ -18,6 +18,24 @@ async function all(req, res) {
     }
 }
 
+router.get('/self', [authenticate], self);
+
+async function self(req, res) {
+    console.log('users/self');
+
+    try {
+        const user_id = req.user._id
+
+        let user = await UserService.getUser(user_id);
+        res.status(200).json(user);
+    } catch (e) {
+        if (e instanceof NotFoundError) {
+            return res.status(404).json({ message: e.message });
+        }
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+}
+
 
 router.get('/:_id', [authenticate], user);
 
