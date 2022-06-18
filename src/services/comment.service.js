@@ -13,12 +13,7 @@ const createComment = async (comment, current_user) => {
         ...comment,
         parent: ObjectId(comment.parent),
         timestamp: new Date(),
-        owner: {
-            _id: _id,
-            name: name, 
-            surname: surname,
-            username: username
-        } // embed for ease for now
+        owner: _id
     }
 
     let parent = await posts.findOne({ _id: comment.parent});
@@ -30,6 +25,48 @@ const createComment = async (comment, current_user) => {
         ...comment,
         _id: inserted_comment.insertedId.toHexString()
     }
+}
+
+const postComments = async (parent) => {
+
+    // check for parent
+    
+    const pipeline = [
+        {
+            '$match': {
+                parent: ObjectId(parent)
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'owner',
+                'foreignField': '_id',
+                'as': 'owner'
+            }
+        },
+        {
+            "$unwind": "$owner"
+        },
+        {
+            "$project": {
+                "owner.email": 0,
+                "owner.bio": 0,
+                "owner.pass": 0,
+                "owner.roles": 0
+            }
+        },
+        {
+            '$sort': {
+                'timestamp': -1
+            }
+        }
+    ]
+
+    let post_comments = await comments.aggregate(pipeline).toArray();
+
+    return post_comments;
+
 }
 
 const delComment = async (comment, current_user) => {
@@ -50,5 +87,6 @@ const delComment = async (comment, current_user) => {
 
 module.exports = {
     createComment,
+    postComments,
     delComment
 }

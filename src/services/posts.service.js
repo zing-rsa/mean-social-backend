@@ -50,6 +50,11 @@ const getPosts = async () => {
                 "owner.pass": 0,
                 "owner.roles": 0
             }
+        },
+        {
+            '$sort': {
+                'timestamp': -1
+            }
         }
     ]
 
@@ -91,6 +96,11 @@ const getUserPosts = async (user_id) => {
                 "owner.bio": 0,
                 "owner.pass": 0,
                 "owner.roles": 0
+            }
+        },
+        {
+            '$sort': {
+                'timestamp': -1
             }
         }
     ]
