@@ -40,7 +40,31 @@ const unfollow = async (details, current_user) => {
 
 }
 
+const followInfo = async (user_id, current_user) => {
+
+    // check for missing user
+
+    const followers = await follows.find({ followee: ObjectId(user_id) }).toArray();
+    const following = await follows.find({ owner: ObjectId(user_id) }).toArray();
+    let isFollowed = false;
+
+    for (let i = 0; i < followers.length; i++) {
+        if (followers[i].owner.equals(current_user._id)) {
+            isFollowed = true;
+        }
+    }
+
+    return {
+        // followers: followers,
+        // following: following,
+        followerCount: followers.length,
+        followingCount: following.length,
+        isFollowed: isFollowed
+    }
+}
+
 module.exports = {
-    follow, 
-    unfollow
+    follow,
+    unfollow,
+    followInfo
 }

@@ -23,7 +23,7 @@ async function follow(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let result = await FollowService.follow(value, current_user);
-        return res.status(200).json(result);
+        return res.status(201).send();
 
     } catch (e) {
         if (e instanceof ValidationError) {
@@ -55,7 +55,7 @@ async function unfollow(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         await FollowService.unfollow(value, current_user);
-        return res.status(200);
+        return res.status(200).send();
 
     } catch (e) {
         if (e instanceof ValidationError) {

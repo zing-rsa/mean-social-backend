@@ -34,31 +34,6 @@ async function create(req, res) {
 }
 
 
-router.get('/:parent', [authenticate], postComments);
-
-async function postComments(req, res) {
-    const schema = Joi.string().alphanum().length(24);
-
-    try {
-
-        const { error, value } = schema.validate(req.params.parent);
-        if (error) throw new ValidationError(error.details[0].message);
-
-        let comments = await CommentService.postComments(value);
-        return res.status(200).json(comments);
-
-    } catch (e) {
-        if (e instanceof ValidationError) {
-            return res.status(400).json({ message: e.message });
-        }
-        if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message });
-        }
-        return res.status(500).json({ message: 'Unknown error' });
-    }
-}
-
-
 router.delete('/delete', [authenticate], del);
 
 async function del(req, res) {

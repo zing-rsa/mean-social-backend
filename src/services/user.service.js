@@ -9,6 +9,10 @@ let comments = db.collection('comments');
 let follows = db.collection('follows');
 
 const getUsers = async () => {
+    const schema = {
+        pass: 0
+    }
+    
     return await users.find({}).project(schema).toArray();
 }
 

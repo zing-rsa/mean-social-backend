@@ -1,5 +1,7 @@
 const { ValidationError, NotFoundError, AuthorizationError, ConflictError } = require('../../models/errors');
 const { authenticate, authorize } = require('../../middleware');
+const FollowService = require('../../services/follow.service');
+const PostService = require('../../services/posts.service');
 const UserService = require('../../services/user.service');
 const router = require('express').Router();
 const Joi = require('joi');
@@ -61,6 +63,55 @@ async function user(req, res) {
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
+}
+
+router.get('/:_id/posts', [authenticate], user_posts);
+
+async function user_posts(req, res) {
+
+    console.log('users/:_id/posts');
+    const schema = Joi.string().length(24);
+
+    try {
+        const user_id = req.params._id;
+
+        const { error, value } = schema.validate(user_id, { escapeHtml: true });
+        if (error) throw new ValidationError(error.details[0].message);
+
+        let posts = await PostService.getUserPosts(value);
+        return res.status(200).json(posts);
+    } catch (e) {
+        if (e instanceof ValidationError){
+            return res.status(400).json({ message: e.message });
+        }
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+
+}
+
+router.get('/:_id/follows', [authenticate], userFollows);
+
+async function userFollows(req, res) {
+
+    console.log('users/:_id/follows');
+    const schema = Joi.string().length(24);
+
+    try {
+        const user_id = req.params._id;
+        const current_user = req.user;
+
+        const { error, value } = schema.validate(user_id, { escapeHtml: true });
+        if (error) throw new ValidationError(error.details[0].message);
+
+        let followInfo = await FollowService.followInfo(value, current_user);
+        return res.status(200).json(followInfo);
+    } catch (e) {
+        if (e instanceof ValidationError){
+            return res.status(400).json({ message: e.message });
+        }
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+
 }
 
 

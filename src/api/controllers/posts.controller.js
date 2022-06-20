@@ -1,6 +1,7 @@
 const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
-const { authenticate } = require('../../middleware');
+const CommentService = require('../../services/comment.service')
 const PostService = require('../../services/posts.service')
+const { authenticate } = require('../../middleware');
 const router = require('express').Router();
 const Joi = require('joi');
 
@@ -19,21 +20,29 @@ async function all(req, res) {
     }
 }
 
+// TODO? 
+// router.get('/:_id', [authenticate], post);
 
-router.get('/:_id', [authenticate], user_posts);
 
-async function user_posts(req, res) {
-    console.log('posts/');
+// async function post(req, res) {
+
+// }
+
+router.get('/:_id/comments', [authenticate], post_comments);
+
+async function post_comments(req, res) {
+    console.log('posts/:_id/comments');
+
     const schema = Joi.string().length(24);
 
     try {
-        const user_id = req.params._id;
+        const post_id = req.params._id;
 
-        const { error, value } = schema.validate(user_id, { escapeHtml: true });
+        const { error, value } = schema.validate(post_id, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let posts = await PostService.getUserPosts(value);
-        return res.status(200).json(posts);
+        let comments = await CommentService.postComments(value);
+        return res.status(200).json(comments);
     } catch (e) {
         if (e instanceof ValidationError){
             return res.status(400).json({ message: e.message });
@@ -41,7 +50,6 @@ async function user_posts(req, res) {
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
-
 
 router.post('/create', [authenticate], create);
 
