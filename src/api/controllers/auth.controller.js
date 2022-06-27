@@ -64,9 +64,6 @@ async function login(req, res) {
         if (e instanceof AuthError) {
             return res.status(401).json({ message: e.message });
         }
-        if (e instanceof NotFoundError) {
-            return res.status(404).json({ message: e.message });
-        }
         return res.status(500).json({ message: 'Unknown error' });
     }
 }

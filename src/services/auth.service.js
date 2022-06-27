@@ -44,10 +44,10 @@ const login = async (user_creds) => {
     const query = { email: user_creds.email };
 
     let existing_user = await users.findOne(query);
-    if (!existing_user) throw new NotFoundError('User not found');
+    if (!existing_user) throw new AuthError('Incorrect credentials');
 
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
-    if (!validPassword) throw new AuthError('Incorrect password');
+    if (!validPassword) throw new AuthError('Incorrect credentials');
 
     const token = jwt.sign(
         { _id: existing_user._id },
