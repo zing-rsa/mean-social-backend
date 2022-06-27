@@ -52,7 +52,7 @@ async function del(req, res) {
 
         await CommentService.delComment(value, current_user);
 
-        return res.status(200);
+        return res.status(200).send();
 
     } catch (e) {
         if (e instanceof ValidationError) {

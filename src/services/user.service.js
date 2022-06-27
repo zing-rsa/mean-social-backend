@@ -81,12 +81,16 @@ const editUser = async (user_creds, current_user) => {
     return output_user;
 }
 
-const delUser = async (user) => {
+const delUser = async (user, current_user) => {
     const query = { _id: ObjectId(user._id) };
     const owner_query = { owner: ObjectId(user._id) };
 
     let existing_user = await users.findOne(query);
     if (!existing_user) throw new NotFoundError('User does not exist');
+
+    if (existing_user._id.equals(current_user._id)) {
+        throw new ConflictError('Cannot delete self');
+    }
 
     await comments.deleteMany(owner_query);
     await follows.deleteMany(owner_query);

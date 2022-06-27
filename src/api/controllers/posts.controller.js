@@ -97,7 +97,7 @@ async function del(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         await PostService.delPost(value, current_user);
-        return res.status(200);
+        return res.status(200).send();
     } catch(e) {
         if (e instanceof NotFoundError) {
             return res.status(404).json({message: e.message });

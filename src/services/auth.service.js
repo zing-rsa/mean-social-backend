@@ -57,10 +57,11 @@ const login = async (user_creds) => {
         }
     );
 
-    existing_user = new User(existing_user)
     existing_user.token = token
 
-    return existing_user
+    const { pass, ...withoutPass} = existing_user;
+
+    return withoutPass;
 
 }
 

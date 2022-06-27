@@ -168,17 +168,21 @@ async function del(req, res) {
 
     try {
         const user = req.body;
+        const current_user = req.user;
 
         const { error, value } = schema.validate(user, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        await UserService.delUser(value);
-        return res.status(200);
+        await UserService.delUser(value, current_user);
+        return res.status(200).send();
 
     } catch (e) {
         if (e instanceof NotFoundError) {
             return res.status(404).json({ message: e.message });
         }
+        if (e instanceof ConflictError) {
+            return res.status(409).json({ message: e.message });
+        }   
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
