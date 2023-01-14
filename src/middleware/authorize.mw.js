@@ -1,5 +1,3 @@
-const db = require('../mongo').db();
-
 const authorize = (roles = []) => {
 
   if (typeof roles === 'string') {

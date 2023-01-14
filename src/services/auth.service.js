@@ -1,11 +1,27 @@
 const { ConflictError, NotFoundError, AuthError } = require('../models/errors')
 const { User, UserMapper } = require('../models/user')
-const config = require('../config')
-const jwt = require('jsonwebtoken')
 const db = require('../mongo').db()
 const bcrypt = require('bcrypt')
 
+const {
+    getAccessToken,
+    getRefreshToken,
+    validateRefreshToken,
+    validateAccessToken
+} = require('./token.service')
+
 let users = db.collection('users');
+
+
+const refresh = async (token) => {
+
+    const previous_token_user = validateAccessToken(token);
+
+
+
+
+
+}
 
 const createUser = async (user_creds) => {
     let new_user = new UserMapper(user_creds);
@@ -15,7 +31,7 @@ const createUser = async (user_creds) => {
 
     const salt = await bcrypt.genSalt(10);
     const pass = await bcrypt.hash(new_user.pass, salt);
-    
+
     new_user = {
         ...new_user,
         pass: pass,
@@ -26,15 +42,12 @@ const createUser = async (user_creds) => {
 
     let inserted_user = await users.insertOne(new_user)
 
-    const token = jwt.sign(
-        { _id: inserted_user.insertedId.toHexString() },
-        config.jwt_secret,
-        {
-            expiresIn: '30m',
-        }
-    );
+    const access_token = getAccessToken(inserted_user.insertedId.toHexString());
+    const refresh_token = getAccessToken(inserted_user.insertedId.toHexString());
 
     output_user = new User(new_user)
+
+    // add tokens to headers
     output_user.token = token;
 
     return output_user;
@@ -49,17 +62,14 @@ const login = async (user_creds) => {
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
     if (!validPassword) throw new AuthError('Incorrect credentials');
 
-    const token = jwt.sign(
-        { _id: existing_user._id },
-        config.jwt_secret,
-        {
-            expiresIn: '30m',
-        }
-    );
+    const access_token = getAccessToken(existing_user._id);
+    const refresh_token = getAccessToken(existing_user._id);
 
     existing_user.token = token
 
-    const { pass, ...withoutPass} = existing_user;
+    //send tokens in headers
+
+    const { pass, ...withoutPass } = existing_user;
 
     return withoutPass;
 

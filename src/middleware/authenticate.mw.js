@@ -1,8 +1,8 @@
 const { NotFoundError } = require('../models/errors');
 const ObjectId = require('mongodb').ObjectId;
-const jwt = require('jsonwebtoken');
-const config = require('../config');
 const db = require('../mongo').db();
+
+const { validateAccessToken } = require('../services/token.service')
 
 let users = db.collection('users');
 
@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
   }
 
   try {
-    const decoded_id = (jwt.verify(token, config.jwt_secret))._id;
+    const decoded_id = (validateAccessToken(token))._id;
 
     const user = await users.findOne({ _id: ObjectId(decoded_id) });
     if (!user) throw new NotFoundError('Invalid User');

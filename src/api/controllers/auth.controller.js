@@ -3,12 +3,12 @@ const AuthService = require('../../services/auth.service')
 const router = require('express').Router();
 const Joi = require('joi');
 
-
-router.post('/login',  login);
-router.post('/signup', signup);
+const { refreshOnly } = require('../../middleware/refresh.mw')
 
 module.exports = router
 
+
+router.post('/signup', signup);
 
 async function signup(req, res) {
     console.log('auth/signup');
@@ -22,13 +22,13 @@ async function signup(req, res) {
     });
     
     try {
-
+        
         const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
-
+        
         let user = await AuthService.createUser(value);
         return res.status(201).json(user);
-
+        
     } catch (e) {
         if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message });
@@ -36,10 +36,13 @@ async function signup(req, res) {
         if (e instanceof ConflictError) {
             return res.status(409).json({ message: e.message }); // right code?
         }
-
+        
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
+
+
+router.post('/login',  login);
 
 async function login(req, res) {
     console.log('/auth/login');
@@ -66,4 +69,11 @@ async function login(req, res) {
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
+}
+
+router.get('/refresh', [refreshOnly], refresh)
+
+async function refresh(req, res) {
+    console.log("/refresh");
+    res.status(200).send();
 }
