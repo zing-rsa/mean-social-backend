@@ -6,7 +6,7 @@ const getAccessToken = (user) => {
         { _id: user },
         config.jwt_access_secret,
         {
-            expiresIn: '30m',
+            expiresIn: '10s',
         }
     );
 }

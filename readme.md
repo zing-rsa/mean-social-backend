@@ -14,12 +14,14 @@ Front-end at: [mern-social-frontend](https://github.com/zing-rsa/mern-social-fro
 
 ## Feature ideas:
 
-
 ### To do:
 
 - Image upload for posts
 - Image upload for profile
 - likes
+- post suggestion algorithm based on following
+- load balanced, scalable backend
+- UI design
 
 
 ### Done:

@@ -1,26 +1,52 @@
 const { ConflictError, NotFoundError, AuthError } = require('../models/errors')
 const { User, UserMapper } = require('../models/user')
+const ObjectId = require('mongodb').ObjectId;
 const db = require('../mongo').db()
 const bcrypt = require('bcrypt')
 
 const {
     getAccessToken,
     getRefreshToken,
-    validateRefreshToken,
-    validateAccessToken
+    validateRefreshToken
 } = require('./token.service')
 
 let users = db.collection('users');
 
 
-const refresh = async (token) => {
+const refresh = async (req) => {
 
-    const previous_token_user = validateAccessToken(token);
+    let decoded_id;
+    req.cookies = {};
 
+    const { headers: { cookie } } = req;
 
+    if (!cookie) throw new AuthError('Refresh cookie not found');
 
+    let items = cookie.split('; ') || [];
 
+    items.forEach((item) => {
+        split = item.split('=');
+        req.cookies[split[0]] = split[1];
+    });
 
+    let token = req.cookies['refresh_token'];
+
+    if (!token) throw new AuthError('Refresh token not found');
+
+    token = token.replace('Bearer ', '');
+
+    try {
+        decoded_id = (validateRefreshToken(token))._id;
+    } catch (e) {
+        throw new AuthError('Invalid refresh token');
+    }
+
+    const user = await users.findOne({ _id: ObjectId(decoded_id) });
+    if (!user) throw new NotFoundError('Invalid User');
+
+    const refreshed_token = getAccessToken(decoded_id);
+
+    return refreshed_token;
 }
 
 const createUser = async (user_creds) => {
@@ -62,20 +88,14 @@ const login = async (user_creds) => {
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
     if (!validPassword) throw new AuthError('Incorrect credentials');
 
-    const access_token = getAccessToken(existing_user._id);
-    const refresh_token = getAccessToken(existing_user._id);
-
-    existing_user.token = token
-
-    //send tokens in headers
-
-    const { pass, ...withoutPass } = existing_user;
-
-    return withoutPass;
-
+    return {
+        access_token: getAccessToken(existing_user._id),
+        refresh_token: getRefreshToken(existing_user._id)
+    };
 }
 
 module.exports = {
     createUser,
+    refresh,
     login
 }

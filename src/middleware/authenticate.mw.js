@@ -7,14 +7,16 @@ const { validateAccessToken } = require('../services/token.service')
 let users = db.collection('users');
 
 const authenticate = async (req, res, next) => {
-  const token =
-    req.body.token || req.query.token || req.headers['authorization'];
+  let token =  req.headers['authorization'] || req.body.token || req.query.token;
 
   if (!token) {
     return res.status(403).json({ message: 'Token not included' });
   }
 
+  token = token.replace('Bearer ', '');
+
   try {
+
     const decoded_id = (validateAccessToken(token))._id;
 
     const user = await users.findOne({ _id: ObjectId(decoded_id) });
