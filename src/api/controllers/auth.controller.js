@@ -1,12 +1,13 @@
 const { ConflictError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
 const AuthService = require('../../services/auth.service')
+const upload = require('../../services/multer.service')
 const router = require('express').Router();
 const Joi = require('joi');
 
 module.exports = router
 
 
-router.post('/signup', signup);
+router.post('/signup', upload.fields([{name: 'avatar', maxCount:1 }, {name: 'banner', maxCount:1}]), signup);
 
 async function signup(req, res) {
     console.log('auth/signup');

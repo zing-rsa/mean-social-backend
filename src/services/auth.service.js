@@ -66,15 +66,9 @@ const createUser = async (user_creds) => {
         roles: ['user']
     }
 
-    let inserted_user = await users.insertOne(new_user)
-
-    const access_token = getAccessToken(inserted_user.insertedId.toHexString());
-    const refresh_token = getAccessToken(inserted_user.insertedId.toHexString());
+    await users.insertOne(new_user)
 
     output_user = new User(new_user)
-
-    // add tokens to headers
-    output_user.token = token;
 
     return output_user;
 }
