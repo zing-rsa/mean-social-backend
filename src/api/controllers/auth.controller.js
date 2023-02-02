@@ -1,6 +1,7 @@
 const { ConflictError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
+const FileService = require('../../services/file.service')
 const AuthService = require('../../services/auth.service')
-const upload = require('../../services/multer.service')
+const upload = require('../../multer')
 const router = require('express').Router();
 const Joi = require('joi');
 
@@ -26,6 +27,10 @@ async function signup(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await AuthService.createUser(value);
+
+        user = await FileService.SaveUserProfileImage(user, req.files['avatar'][0]);
+        user = await FileService.SaveUserBannerImage(user, req.files['banner'][0]);
+
         return res.status(201).json(user);
 
     } catch (e) {

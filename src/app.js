@@ -13,6 +13,8 @@ async function start() {
 
     app.use('/api', require('./api'));
 
+    app.use('/media', express.static('uploads'));
+
     app.listen(config.express.port, function () {
         console.log(`App listening on port ${config.express.port}!`);
     });

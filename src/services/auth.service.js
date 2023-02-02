@@ -56,11 +56,11 @@ const createUser = async (user_creds) => {
     if (existing_user) throw new ConflictError('Email already used')
 
     const salt = await bcrypt.genSalt(10);
-    const pass = await bcrypt.hash(new_user.pass, salt);
+    const user_pass = await bcrypt.hash(new_user.pass, salt);
 
     new_user = {
         ...new_user,
-        pass: pass,
+        pass: user_pass,
         followers: 0,
         following: 0,
         roles: ['user']
@@ -68,9 +68,9 @@ const createUser = async (user_creds) => {
 
     await users.insertOne(new_user)
 
-    output_user = new User(new_user)
+    const { pass, ...withoutPass} = new_user;
 
-    return output_user;
+    return withoutPass;
 }
 
 const login = async (user_creds) => {

@@ -1,10 +1,11 @@
 const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
 const CommentService = require('../../services/comment.service')
+const FileService = require('../../services/file.service')
 const PostService = require('../../services/posts.service')
 const { authenticate } = require('../../middleware');
 const router = require('express').Router();
+const upload = require('../../multer');
 const Joi = require('joi');
-
 
 
 router.get('/', [authenticate], all);
@@ -19,14 +20,6 @@ async function all(req, res) {
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
-
-// TODO? 
-// router.get('/:_id', [authenticate], post);
-
-
-// async function post(req, res) {
-
-// }
 
 router.get('/:_id/comments', [authenticate], post_comments);
 
@@ -51,7 +44,7 @@ async function post_comments(req, res) {
     }
 }
 
-router.post('/create', [authenticate], create);
+router.post('/create', [authenticate, upload.single('image')], create);
 
 async function create(req, res) {
     console.log('posts/create');
@@ -63,11 +56,17 @@ async function create(req, res) {
     try {
         const current_user = req.user;
         const post_details = req.body;
+        const post_file = req.file;
 
         const { error, value } = schema.validate(post_details, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
         let post = await PostService.createPost(value, current_user);
+
+        if (post_file){
+            post = await FileService.SavePostImage(post, post_file);
+        }
+        
         return res.status(201).json(post);
 
     } catch (e) {
