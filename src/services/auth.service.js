@@ -1,5 +1,5 @@
 const { ConflictError, NotFoundError, AuthError } = require('../models/errors')
-const { User, UserMapper } = require('../models/user')
+const { UserMapper } = require('../models/user')
 const ObjectId = require('mongodb').ObjectId;
 const db = require('../mongo').db()
 const bcrypt = require('bcrypt')
@@ -8,7 +8,7 @@ const {
     getAccessToken,
     getRefreshToken,
     validateRefreshToken
-} = require('./token.service')
+} = require('./token.service');
 
 let users = db.collection('users');
 
@@ -49,7 +49,50 @@ const refresh = async (req) => {
     return refreshed_token;
 }
 
-const createUser = async (user_creds) => {
+const login = async (user_creds) => {
+
+    const pipeline = [
+        {
+            '$match': {
+                email: user_creds.email
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'follows',
+                'localField': '_id',
+                'foreignField': 'owner',
+                'as': 'following'
+            }
+        },
+        {
+            '$lookup': {
+                'from': 'follows',
+                'localField': '_id',
+                'foreignField': 'followee',
+                'as': 'followers'
+            }
+        }
+    ]
+
+    let existing_user = (await users.aggregate(pipeline).toArray())[0] || null;
+    if (!existing_user) throw new AuthError('Incorrect credentials');
+
+    const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
+    if (!validPassword) throw new AuthError('Incorrect credentials');
+
+    const { pass, following, followers, ...stripped } = existing_user;
+
+    return {
+        ...stripped,
+        followers: existing_user.followers.length,
+        following: existing_user.following.length,
+        access_token: getAccessToken(existing_user._id),
+        refresh_token: getRefreshToken(existing_user._id)
+    };
+}
+
+const signUp = async (user_creds) => {
     let new_user = new UserMapper(user_creds);
 
     let existing_user = await users.findOne({ email: new_user.email })
@@ -66,30 +109,19 @@ const createUser = async (user_creds) => {
         roles: ['user']
     }
 
-    await users.insertOne(new_user)
+    let insert_detail = await users.insertOne(new_user)
 
-    const { pass, ...withoutPass} = new_user;
-
-    return withoutPass;
-}
-
-const login = async (user_creds) => {
-    const query = { email: user_creds.email };
-
-    let existing_user = await users.findOne(query);
-    if (!existing_user) throw new AuthError('Incorrect credentials');
-
-    const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
-    if (!validPassword) throw new AuthError('Incorrect credentials');
+    const { pass, ...stripped } = new_user;
 
     return {
-        access_token: getAccessToken(existing_user._id),
-        refresh_token: getRefreshToken(existing_user._id)
+        ...stripped,
+        access_token: getAccessToken(insert_detail.insertedId),
+        refresh_token: getRefreshToken(insert_detail.insertedId)
     };
 }
 
 module.exports = {
-    createUser,
+    signUp,
     refresh,
     login
 }

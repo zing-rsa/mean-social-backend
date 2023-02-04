@@ -8,7 +8,7 @@ const Joi = require('joi');
 module.exports = router
 
 
-router.post('/signup', upload.fields([{name: 'avatar', maxCount:1 }, {name: 'banner', maxCount:1}]), signup);
+router.post('/signup', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), signup);
 
 async function signup(req, res) {
     console.log('auth/signup');
@@ -26,12 +26,23 @@ async function signup(req, res) {
         const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let user = await AuthService.createUser(value);
+        let user = await AuthService.signUp(value);
 
-        user = await FileService.SaveUserProfileImage(user, req.files['avatar'][0]);
-        user = await FileService.SaveUserBannerImage(user, req.files['banner'][0]);
+        if (req.files['avatar'] && req.files['avatar'][0])
+            user = await FileService.SaveUserProfileImage(user, req.files['avatar'][0]);
+        if (req.files['banner'] && req.files['banner'][0])
+            user = await FileService.SaveUserBannerImage(user, req.files['banner'][0]);
 
-        return res.status(201).json(user);
+        const { refresh_token, ...stripped } = user;
+
+        res.cookie('refresh_token', refresh_token, {
+            sameSite: 'none',
+            secure: true,
+            httpOnly: true,
+            path: 'auth/refresh'
+        });
+
+        return res.status(201).json(stripped);
 
     } catch (e) {
         if (e instanceof ValidationError) {
@@ -61,16 +72,18 @@ async function login(req, res) {
         const { error, value } = schema.validate(req.body, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let details = await AuthService.login(value);
+        let user = await AuthService.login(value);
 
-        res.cookie('refresh_token', details.refresh_token, {
+        const { refresh_token, ...stripped } = user;
+
+        res.cookie('refresh_token', refresh_token, {
             sameSite: 'none',
             secure: true,
             httpOnly: true,
             path: 'auth/refresh'
         });
 
-        return res.status(200).json({ access_token: details.access_token });
+        return res.status(200).json(stripped);
 
     } catch (e) {
         if (e instanceof ValidationError) {
