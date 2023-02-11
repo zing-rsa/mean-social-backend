@@ -53,7 +53,8 @@ const getUser = async (user_id) => {
     user = {
         ...user,
         followers: user.followers.length,
-        following: user.following.length
+        following: user.following.length,
+        isAdmin: user.roles.includes('admin')
     }
 
     return user;
@@ -92,6 +93,7 @@ const delUser = async (user, current_user) => {
         throw new ConflictError('Cannot delete self');
     }
 
+    await follows.deleteMany({ followee: ObjectId(user._id) });
     await comments.deleteMany(owner_query);
     await follows.deleteMany(owner_query);
     await posts.deleteMany(owner_query);

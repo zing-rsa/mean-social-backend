@@ -81,14 +81,15 @@ const login = async (user_creds) => {
     const validPassword = await bcrypt.compare(user_creds.pass, existing_user.pass);
     if (!validPassword) throw new AuthError('Incorrect credentials');
 
-    const { pass, following, followers, ...stripped } = existing_user;
+    const { pass, following, followers, roles, ...stripped } = existing_user;
 
     return {
         ...stripped,
         followers: existing_user.followers.length,
         following: existing_user.following.length,
         access_token: getAccessToken(existing_user._id),
-        refresh_token: getRefreshToken(existing_user._id)
+        refresh_token: getRefreshToken(existing_user._id),
+        isAdmin: roles.includes('admin')
     };
 }
 

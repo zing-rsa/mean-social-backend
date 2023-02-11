@@ -182,7 +182,10 @@ async function del(req, res) {
         }
         if (e instanceof ConflictError) {
             return res.status(409).json({ message: e.message });
-        }   
+        }  
+        if (e instanceof ValidationError) {
+            return res.status(400).json({ message: e.message });
+        } 
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
