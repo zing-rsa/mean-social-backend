@@ -1,4 +1,5 @@
 const { ConflictError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
+const { authenticate, authorize } = require('../../middleware');
 const FileService = require('../../services/file.service')
 const AuthService = require('../../services/auth.service')
 const upload = require('../../multer')
@@ -111,4 +112,18 @@ async function refresh(req, res) {
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
+}
+
+
+router.get('/logout', [authenticate], logout)
+
+async function logout(req, res){
+    try {
+        // res.clearCookie('refresh_token');
+        res.setHeader('set-cookie', 'refresh_token=; max-age=0');
+        return res.status(200).send();
+    } catch (e) {
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+
 }
