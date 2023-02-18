@@ -15,5 +15,6 @@ router.use('/posts', require('./controllers/posts.controller'));
 router.use('/comments', require('./controllers/comments.controller'));
 router.use('/follows', require('./controllers/follows.controller'));
 router.use('/auth', require('./controllers/auth.controller'));
+router.use('/likes', require('./controllers/likes.controller'));
 
 module.exports = router

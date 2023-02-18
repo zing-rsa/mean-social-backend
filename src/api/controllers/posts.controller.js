@@ -1,7 +1,8 @@
 const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
-const CommentService = require('../../services/comment.service')
-const FileService = require('../../services/file.service')
-const PostService = require('../../services/posts.service')
+const CommentService = require('../../services/comment.service');
+const PostService = require('../../services/posts.service');
+const LikeService = require('../../services/like.service');
+const FileService = require('../../services/file.service');
 const { authenticate } = require('../../middleware');
 const router = require('express').Router();
 const upload = require('../../multer');
@@ -14,7 +15,7 @@ async function all(req, res) {
     console.log('posts/');
     
     try {
-        let posts = await PostService.getPosts();
+        let posts = await PostService.getPosts(req.user);
         return res.status(200).json(posts);
     } catch (e) {
         return res.status(500).json({ message: 'Unknown error' });
@@ -77,8 +78,6 @@ async function create(req, res) {
     }
 }
 
-
-
 router.delete('/delete', [authenticate], del);
 
 async function del(req, res) {
@@ -106,6 +105,31 @@ async function del(req, res) {
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
+}
+
+router.get('/:_id/likes', [authenticate], likes);
+
+async function likes (req, res) {
+    console.log('posts/:_id/likes')
+
+    const schema = Joi.string().length(24);
+
+    try {
+        const post_id = req.params._id;
+        const current_user = req.user;
+
+        const { error, value } = schema.validate(post_id, { escapeHtml: true });
+        if (error) throw new ValidationError(error.details[0].message);
+
+        let likes = await LikeService.getPostLikes(value, current_user);
+        return res.status(200).json(likes);
+    } catch (e) {
+        if (e instanceof ValidationError){
+            return res.status(400).json({ message: e.message });
+        }
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+
 }
 
 module.exports = router

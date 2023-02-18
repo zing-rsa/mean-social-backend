@@ -21,7 +21,7 @@ const createPost = async (post, current_user) => {
     }
 }
 
-const getPosts = async () => {
+const getPosts = async (current_user) => {
 
     const pipeline = [
         {
@@ -60,6 +60,14 @@ const getPosts = async () => {
             "$unwind": "$owner"
         },
         {
+            '$lookup': {
+                'from': 'likes',
+                'localField': '_id',
+                'foreignField': 'post',
+                'as': 'likes'
+            }
+        },
+        {
             "$project": {
                 "owner.email": 0,
                 "owner.bio": 0,
@@ -80,10 +88,24 @@ const getPosts = async () => {
 
     const data = await posts.aggregate(pipeline).toArray();
 
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].likes.map(l => l.owner.equals(current_user._id)).length){
+            data[i].likes = {
+                'likeCount': data[i].likes.length,
+                'isLiked': true
+            }
+        } else {
+            data[i].likes = {
+                'likeCount': data[i].likes.length,
+                'isLiked': false
+            }
+        }
+    }
+
     return data;
 }
 
-const getUserPosts = async (user_id) => {
+const getUserPosts = async (user_id, current_user) => {
 
     const pipeline = [
         {
@@ -111,6 +133,14 @@ const getUserPosts = async (user_id) => {
             "$unwind": "$owner"
         },
         {
+            '$lookup': {
+                'from': 'likes',
+                'localField': '_id',
+                'foreignField': 'post',
+                'as': 'likes'
+            }
+        },
+        {
             "$project": {
                 "owner.email": 0,
                 "owner.bio": 0,
@@ -125,9 +155,23 @@ const getUserPosts = async (user_id) => {
         }
     ]
 
-    let user_posts = await posts.aggregate(pipeline).toArray();
+    let data = await posts.aggregate(pipeline).toArray();
 
-    return user_posts;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].likes.map(l => l.owner.equals(current_user._id)).length){
+            data[i].likes = {
+                'likeCount': data[i].likes.length,
+                'isLiked': true
+            }
+        } else {
+            data[i].likes = {
+                'likeCount': data[i].likes.length,
+                'isLiked': false
+            }
+        }
+    }
+
+    return data;
 }
 
 const delPost = async (post, current_user) => {

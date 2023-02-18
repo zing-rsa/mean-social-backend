@@ -79,7 +79,7 @@ async function user_posts(req, res) {
         const { error, value } = schema.validate(user_id, { escapeHtml: true });
         if (error) throw new ValidationError(error.details[0].message);
 
-        let posts = await PostService.getUserPosts(value);
+        let posts = await PostService.getUserPosts(value, req.user);
         return res.status(200).json(posts);
     } catch (e) {
         if (e instanceof ValidationError){
