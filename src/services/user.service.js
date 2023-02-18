@@ -63,22 +63,27 @@ const getUser = async (user_id) => {
 const editUser = async (user_creds, current_user) => {
 
     const id_query = { _id: ObjectId(user_creds._id) };
-    const email_query = { email: user_creds.email };
+    let email_query;
+
+    if(user_creds.email)
+        email_query = { email: user_creds.email };
 
     let existing_user = await users.findOne(id_query);
     if (!existing_user) throw new NotFoundError('User does not exist');
 
-    let existing_email = await users.findOne(email_query);
-    if (existing_email) throw new ConflictError('Email already used');
+    if(email_query) {
+        let existing_email = await users.findOne(email_query);
+        if (existing_email) throw new ConflictError('Email already used');
+    }
 
     if (!existing_user._id.equals(current_user._id) && !current_user.roles.includes('admin')) {
         throw new AuthorizationError("Action not permitted");
     }
 
     let updated_user = new UserMapper(user_creds);
-    await users.updateOne(query, { $set: updated_user });
+    await users.updateOne(id_query, { $set: updated_user });
 
-    let output_user = new User(await users.findOne(query));
+    const { pass, roles, ...output_user } = await users.findOne(id_query)
     return output_user;
 }
 

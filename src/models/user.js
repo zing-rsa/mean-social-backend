@@ -5,6 +5,7 @@ function User(user) {
     this.username = user.name + '.' + user.surname;
     this.email = user.email;
     this.bio = user.bio;
+    
 }
 
 function UserMapper(user){

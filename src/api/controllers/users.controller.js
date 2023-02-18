@@ -3,7 +3,9 @@ const { authenticate, authorize } = require('../../middleware');
 const FollowService = require('../../services/follow.service');
 const PostService = require('../../services/posts.service');
 const UserService = require('../../services/user.service');
+const FileService = require('../../services/file.service');
 const router = require('express').Router();
+const upload = require('../../multer')
 const Joi = require('joi');
 
 
@@ -37,7 +39,6 @@ async function self(req, res) {
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
-
 
 router.get('/:_id', [authenticate], user);
 
@@ -114,8 +115,7 @@ async function userFollows(req, res) {
 
 }
 
-
-router.put('/edit', [authenticate], edit);
+router.put('/edit', [authenticate, upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }])], edit);
 
 async function edit(req, res) {
     console.log('users/edit');
@@ -126,7 +126,7 @@ async function edit(req, res) {
         surname: Joi.string().pattern(/^[a-zA-Z]+$/),
         email: Joi.string().email(),
         pass: Joi.string().min(5).max(16).alphanum(),
-        bio: Joi.string().max(200).default('')
+        bio: Joi.string().max(200)
     });
 
     try {
@@ -137,6 +137,12 @@ async function edit(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         let user = await UserService.editUser(value, current_user);
+
+        if (req.files['avatar'] && req.files['avatar'][0])
+            user = await FileService.SaveUserProfileImage(user, req.files['avatar'][0]);
+        if (req.files['banner'] && req.files['banner'][0])
+            user = await FileService.SaveUserBannerImage(user, req.files['banner'][0]);
+
         return res.status(200).json(user);
 
     } catch (e) {
