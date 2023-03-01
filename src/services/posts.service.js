@@ -89,7 +89,7 @@ const getPosts = async (current_user) => {
     const data = await posts.aggregate(pipeline).toArray();
 
     for (let i = 0; i < data.length; i++) {
-        if (data[i].likes.map(l => l.owner.equals(current_user._id)).length){
+        if (data[i].likes.find(l => l.owner.equals(current_user._id))){
             data[i].likes = {
                 'likeCount': data[i].likes.length,
                 'isLiked': true
@@ -158,7 +158,7 @@ const getUserPosts = async (user_id, current_user) => {
     let data = await posts.aggregate(pipeline).toArray();
 
     for (let i = 0; i < data.length; i++) {
-        if (data[i].likes.map(l => l.owner.equals(current_user._id)).length){
+        if (data[i].likes.find(l => l.owner.equals(current_user._id))){
             data[i].likes = {
                 'likeCount': data[i].likes.length,
                 'isLiked': true
