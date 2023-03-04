@@ -1,7 +1,7 @@
 const ObjectId = require('mongodb').ObjectId;
 const { google } = require('googleapis');
+const stream = require('stream');
 const path = require('path');
-const fs = require('fs')
 
 const db = require('../mongo').db();
 
@@ -22,10 +22,14 @@ const getDriveService = () => {
 
 const uploadFile = async (fileObject, parent) => {
 
+    const bufferStream = new stream.PassThrough();
+
+    bufferStream.end(fileObject.buffer);
+
     const { data } = await getDriveService().files.create({
         media: {
             mimeType: fileObject.mimeType,
-            body: fs.createReadStream(fileObject.path),
+            body: bufferStream
         },
         requestBody: {
             name: fileObject.filename,
@@ -34,7 +38,7 @@ const uploadFile = async (fileObject, parent) => {
         fields: 'id,name',
     });
 
-    console.log(`Uploaded file ${data.name} ${data.id}`);
+    console.log(`Uploaded file ${data.id}`);
 
     return data.id;
 };
