@@ -1,7 +1,4 @@
 /node_modules
 /.vscode
 .env
-uploads/posts/*
-uploads/banner/*
-uploads/avatar/*
 filekey.json
