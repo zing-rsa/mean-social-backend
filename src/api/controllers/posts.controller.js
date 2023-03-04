@@ -3,6 +3,7 @@ const CommentService = require('../../services/comment.service');
 const PostService = require('../../services/posts.service');
 const LikeService = require('../../services/like.service');
 const FileService = require('../../services/file.service');
+const GoogleService = require('../../services/google.service');
 const { authenticate } = require('../../middleware');
 const router = require('express').Router();
 const upload = require('../../multer');
