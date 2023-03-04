@@ -17,3 +17,11 @@ config.mongoUrl = process.env.MONGO_URL;
 config.posts_folder = process.env.POSTS_FOLDER
 config.avatar_folder = process.env.AVATAR_FOLDER
 config.banner_folder = process.env.BANNER_FOLDER
+
+config.maxFileSize = 2000000
+config.allowedUploadTypes = [
+  '.png',
+  '.jpeg',
+  '.jpg',
+  '.gif'
+]

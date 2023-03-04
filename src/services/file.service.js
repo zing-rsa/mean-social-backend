@@ -1,5 +1,6 @@
 const ObjectId = require('mongodb').ObjectId;
 const { google } = require('googleapis');
+const { v4: uuid } = require('uuid');
 const stream = require('stream');
 const path = require('path');
 
@@ -7,6 +8,13 @@ const db = require('../mongo').db();
 
 let users = db.collection('users');
 let posts = db.collection('posts');
+
+const mimeDict = {
+    'image/jpeg': '.jpg',
+    'image/jpg': '.jpg',
+    'image/png':'.png',
+    'image/gif':'.gif'
+}
 
 const getDriveService = () => {
     const KEYFILEPATH = path.join(__dirname, '../../filekey.json');
@@ -28,11 +36,11 @@ const uploadFile = async (fileObject, parent) => {
 
     const { data } = await getDriveService().files.create({
         media: {
-            mimeType: fileObject.mimeType,
+            mimeType: fileObject.mimetype,
             body: bufferStream
         },
         requestBody: {
-            name: fileObject.filename,
+            name: uuid() + mimeDict[fileObject.mimetype],
             parents: [parent],
         },
         fields: 'id,name',
