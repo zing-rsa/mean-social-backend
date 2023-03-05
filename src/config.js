@@ -25,3 +25,8 @@ config.allowedUploadTypes = [
   '.jpg',
   '.gif'
 ]
+
+config.cors = {
+  origins: ["https://mern-social-frontend-mxim.onrender.com","http://localhost:3000"],
+  default: "https://mern-social-frontend-mxim.onrender.com"
+}
