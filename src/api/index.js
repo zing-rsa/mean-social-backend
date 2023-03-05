@@ -6,7 +6,7 @@ router.use(express.json());
 router.use(cors({
     exposedHeaders: ['Authorization', 'Content-Type'],
     credentials: true,
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000']
+    origin: ['*']
     
 }));
 
