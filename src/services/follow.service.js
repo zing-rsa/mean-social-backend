@@ -1,3 +1,4 @@
+const { createNotification } = require('./notification.service');
 const { NotFoundError, ConflictError } = require('../models/errors');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
@@ -22,8 +23,17 @@ const follow = async (details, current_user) => {
     if (existing_follow) throw new ConflictError('User already followed');
 
     await follows.insertOne(follow);
-    return follow;
 
+    let notification = {
+        owner: follow.followee,
+        action: 'follow',
+        action_item: null,
+        action_owner: current_user._id
+    }
+
+    createNotification(notification);
+
+    return follow;
 }
 
 const unfollow = async (details, current_user) => {

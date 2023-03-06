@@ -1,4 +1,5 @@
 const { ValidationError, NotFoundError, AuthorizationError, ConflictError } = require('../../models/errors');
+const NotificationService = require('../../services/notification.service');
 const { authenticate, authorize } = require('../../middleware');
 const FollowService = require('../../services/follow.service');
 const PostService = require('../../services/posts.service');
@@ -162,7 +163,6 @@ async function edit(req, res) {
     }
 }
 
-
 router.delete('/delete', [authenticate, authorize('admin')], del);
 
 async function del(req, res) {
@@ -195,5 +195,24 @@ async function del(req, res) {
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
+
+router.get('/:_id/notifications', [authenticate], notifications);
+
+async function notifications(req, res) {
+    console.log('users/:_id/notifications');
+
+    const schema = Joi.string().length(24);
+
+    try {
+        const { error, value } = schema.validate(req.params._id, { escapeHtml: true });
+        if (error) throw new ValidationError(error.details[0].message);
+
+        let user_notifications = await NotificationService.getUserNotifications(value);
+        res.status(200).json(user_notifications);
+    } catch (e) {
+        return res.status(500).json({ message: 'Unknown error' });
+    }
+}
+
 
 module.exports = router

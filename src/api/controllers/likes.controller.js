@@ -23,6 +23,7 @@ async function like(req, res) {
         if (error) throw new ValidationError(error.details[0].message);
 
         const data = await LikeService.like(value, current_user);
+
         return res.status(201).send(data);
 
     } catch (e) {

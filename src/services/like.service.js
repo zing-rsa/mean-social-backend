@@ -1,3 +1,4 @@
+const { createNotification } = require('./notification.service');
 const { NotFoundError, ConflictError } = require('../models/errors');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
@@ -20,6 +21,17 @@ const like = async (details, current_user) => {
     if (existing_like) throw new ConflictError('Post already liked');
 
     await likes.insertOne(like);
+
+    if (!post.owner.equals(current_user._id)){
+        let notification = {
+            owner: post.owner,
+            action: 'like',
+            action_item: like.post,
+            action_owner: current_user._id
+        }
+    
+        createNotification(notification);
+    }
 
     let postLikes = await getPostLikes(details.post_id, current_user);
     

@@ -11,7 +11,7 @@ router.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
     res.header("Access-Control-Allow-Credentials", "true")
-    res.header("Access-Control-Allow-Methods", "GET, OPTIONS, PUT, POST, DELETE")
+    res.header("Access-Control-Allow-Methods", "GET, OPTIONS, PUT, POST, DELETE");
     next();
 });
 
@@ -21,5 +21,6 @@ router.use('/comments', require('./controllers/comments.controller'));
 router.use('/follows', require('./controllers/follows.controller'));
 router.use('/auth', require('./controllers/auth.controller'));
 router.use('/likes', require('./controllers/likes.controller'));
+router.use('/notifications', require('./controllers/notifications.controller'));
 
 module.exports = router

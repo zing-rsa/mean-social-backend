@@ -1,8 +1,10 @@
 const { NotFoundError, AuthorizationError } = require('../models/errors');
+const { createNotification } = require('./notification.service');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
 let posts = db.collection('posts');
+let users = db.collection('users');
 let comments = db.collection('comments');
 
 const createPost = async (post, current_user) => {
@@ -14,6 +16,8 @@ const createPost = async (post, current_user) => {
     }
 
     let inserted_post = await posts.insertOne(post);
+
+    createPostMentionNotifications(post.text, inserted_post.insertedId, current_user._id);
 
     return {
         ...post,
@@ -211,6 +215,32 @@ const delPost = async (post, current_user) => {
 
     return;
 }
+
+const createPostMentionNotifications = async (text, post_id, owner_id) => {
+    
+    var notified = [];
+    var tags = text.match(/@[\w\.\d]+\b/ig) || [];
+
+    for (let i = 0; i < tags.length; i++) {
+        if(!notified.includes(tags[i])){
+            let tagged_user = await users.findOne({ username: tags[i] })
+
+            if (tagged_user){
+                let notification = {
+                    owner: tagged_user._id,
+                    action: 'mention',
+                    action_item: post_id,
+                    action_owner: owner_id
+                }
+            
+                createNotification(notification);
+    
+                notified.push(tags[i])
+            }
+        }
+    }
+}
+
 
 module.exports = {
     createPost,
