@@ -3,6 +3,7 @@ const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
 let notis = db.collection('notifications');
+let comments = db.collection('comments');
 let posts = db.collection('posts');
 
 const createNotification = async (details) => {
@@ -60,8 +61,10 @@ const getUserNotifications = async (user_id) => {
     const data = await notis.aggregate(pipeline).toArray();
 
     for (let n of data) {
-        if(n.action === 'like' || n.action === 'mention'){
+        if(['like', 'mention'].includes(n.action)){
             n.action_item = await posts.findOne({_id : n.action_item})
+        } else if (n.action === 'comment'){
+            n.action_item = await comments.findOne({_id : n.action_item})
         }
     }
 
@@ -85,8 +88,14 @@ const clearNotification = async (id) => {
     );
 }
 
+const deleteNotifications = async (query) => {
+    await notis.deleteMany(query);
+}
+
+
 module.exports = {
     getUserNotifications,
+    deleteNotifications,
     createNotification,
     clearNotification
 }

@@ -1,4 +1,4 @@
-const { createNotification } = require('./notification.service');
+const { createNotification, deleteNotifications } = require('./notification.service');
 const { NotFoundError, ConflictError } = require('../models/errors');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
@@ -49,6 +49,12 @@ const unlike = async (details, current_user) => {
     if (!like) throw new NotFoundError('Post is not liked');
 
     await likes.deleteOne(unlike);
+
+    deleteNotifications({
+        action_owner: current_user._id,
+        action_item: unlike.post,
+        action: 'like'
+    })
 
     let postLikes = await getPostLikes(details.post_id, current_user);
     

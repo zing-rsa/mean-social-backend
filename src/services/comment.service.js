@@ -1,3 +1,4 @@
+const { createNotification, deleteNotifications } = require('./notification.service');
 const { NotFoundError, AuthorizationError } = require('../models/errors');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
@@ -7,7 +8,7 @@ let posts = db.collection('posts');
 
 const createComment = async (comment, current_user) => {
 
-    let {_id, name, surname, username } = current_user;
+    let {_id } = current_user;
 
     comment = {
         ...comment,
@@ -20,6 +21,17 @@ const createComment = async (comment, current_user) => {
     if (!parent) throw new NotFoundError('Parent not found');
 
     let inserted_comment = await comments.insertOne(comment);
+
+    if (!parent.owner.equals(current_user._id)){
+        let notification = {
+            owner: parent.owner,
+            action: 'comment',
+            action_item: inserted_comment.insertedId,
+            action_owner: current_user._id
+        }
+    
+        createNotification(notification);
+    }
 
     return {
         ...comment,
@@ -81,6 +93,8 @@ const delComment = async (comment, current_user) => {
     }
 
     await comments.deleteOne(query);
+    deleteNotifications({ action_item: existing_comment._id });
+
     return;
 
 }

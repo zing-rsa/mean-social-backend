@@ -1,5 +1,5 @@
 const { NotFoundError, AuthorizationError } = require('../models/errors');
-const { createNotification } = require('./notification.service');
+const { createNotification, deleteNotifications } = require('./notification.service');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
@@ -212,6 +212,9 @@ const delPost = async (post, current_user) => {
 
     await comments.deleteMany(comment_query);
     await posts.deleteOne(post_query);
+    deleteNotifications({
+        action_item: ObjectId(post._id)
+    })
 
     return;
 }
@@ -225,7 +228,7 @@ const createPostMentionNotifications = async (text, post_id, owner_id) => {
         if(!notified.includes(tags[i])){
             let tagged_user = await users.findOne({ username: tags[i] })
 
-            if (tagged_user){
+            if (tagged_user && !tagged_user._id.equals(owner_id)){
                 let notification = {
                     owner: tagged_user._id,
                     action: 'mention',

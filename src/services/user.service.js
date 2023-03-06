@@ -1,4 +1,5 @@
 const { NotFoundError, AuthorizationError, ConflictError } = require('../models/errors');
+const { deleteNotifications } = require('./notification.service');
 const { User, UserMapper } = require('../models/user');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
@@ -102,6 +103,9 @@ const delUser = async (user, current_user) => {
     await comments.deleteMany(owner_query);
     await follows.deleteMany(owner_query);
     await posts.deleteMany(owner_query);
+
+    await deleteNotifications({action_owner: ObjectId(user._id)});
+    await deleteNotifications(owner_query);
 
     await users.deleteOne(query);
 
