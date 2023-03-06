@@ -6,7 +6,7 @@ const config = require('../config')
 router.use(express.json());
 
 router.use(function(req, res, next) {
-    origin = config.cors.origins.includes(req.header('origin').toLowerCase()) ? req.headers.origin : config.cors.default;
+    origin = config.cors.origins.includes(req.header('origin')?.toLowerCase()) ? req.headers.origin : config.cors.default;
 
     res.header("Access-Control-Allow-Origin", origin);
     res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");

@@ -116,8 +116,24 @@ const getUserPosts = async (user_id, current_user) => {
         {
             '$lookup': {
                 'from': 'comments',
-                'localField': '_id',
-                'foreignField': 'parent',
+                'let': { "postId": "$_id" },
+                'pipeline': [
+                    { '$match': { '$expr': { '$eq': ['$parent', '$$postId'] } } },
+                    {
+                        '$lookup': {
+                            'from': 'users',
+                            'let': { 'commentOwner': '$owner' },
+                            'pipeline': [
+                                { '$match': { '$expr': { '$eq': ["$_id", '$$commentOwner'] } } }
+                            ],
+                            'as': 'owner'
+                        }
+                        
+                    },
+                    {
+                        "$unwind": "$owner"
+                    }
+                ],
                 'as': 'comments'
             }
         },
@@ -145,7 +161,11 @@ const getUserPosts = async (user_id, current_user) => {
                 "owner.email": 0,
                 "owner.bio": 0,
                 "owner.pass": 0,
-                "owner.roles": 0
+                "owner.roles": 0,
+                "comments.owner.email": 0,
+                "comments.owner.bio": 0,
+                "comments.owner.pass": 0,
+                "comments.owner.roles": 0
             }
         },
         {
