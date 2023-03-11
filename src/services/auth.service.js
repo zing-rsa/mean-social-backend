@@ -96,8 +96,11 @@ const login = async (user_creds) => {
 const signUp = async (user_creds) => {
     let new_user = new UserMapper(user_creds);
 
-    let existing_user = await users.findOne({ email: new_user.email })
-    if (existing_user) throw new ConflictError('Email already used')
+    let existing_email = await users.findOne({ email: new_user.email })
+    if (existing_email) throw new ConflictError('Email already used')
+
+    let existing_username = await users.findOne({ email: new_user.username })
+    if (existing_username) throw new ConflictError(`Username "${new_user.username}" already used`)
 
     const salt = await bcrypt.genSalt(10);
     const user_pass = await bcrypt.hash(new_user.pass, salt);

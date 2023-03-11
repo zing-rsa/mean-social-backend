@@ -222,7 +222,7 @@ const delPost = async (post, current_user) => {
 const createPostMentionNotifications = async (text, post_id, owner_id) => {
     
     var notified = [];
-    var tags = text.match(/@[\w\.\d]+\b/ig) || [];
+    var tags = text.match(/@[a-zA-Z0-9._]+\b/ig) || [];
 
     for (let i = 0; i < tags.length; i++) {
         if(!notified.includes(tags[i])){
