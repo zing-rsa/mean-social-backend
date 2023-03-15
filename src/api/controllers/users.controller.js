@@ -1,12 +1,12 @@
 const { ValidationError, NotFoundError, AuthorizationError, ConflictError } = require('../../models/errors');
 const NotificationService = require('../../services/notification.service');
+const { upload, handleMulterException } = require('../../multer');
 const { authenticate, authorize } = require('../../middleware');
 const FollowService = require('../../services/follow.service');
 const PostService = require('../../services/posts.service');
 const UserService = require('../../services/user.service');
 const FileService = require('../../services/file.service');
 const router = require('express').Router();
-const upload = require('../../multer')
 const Joi = require('joi');
 
 
@@ -116,7 +116,7 @@ async function userFollows(req, res) {
 
 }
 
-router.put('/edit', [authenticate, upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }])], edit);
+router.put('/edit', [authenticate, upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), handleMulterException], edit);
 
 async function edit(req, res) {
     console.log('users/edit');

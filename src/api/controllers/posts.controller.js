@@ -1,19 +1,18 @@
 const { ValidationError, NotFoundError, AuthorizationError } = require('../../models/errors');
 const CommentService = require('../../services/comment.service');
+const { upload, handleMulterException } = require('../../multer');
 const PostService = require('../../services/posts.service');
 const LikeService = require('../../services/like.service');
 const FileService = require('../../services/file.service');
 const { authenticate } = require('../../middleware');
 const router = require('express').Router();
-const upload = require('../../multer');
 const Joi = require('joi');
-
 
 router.get('/', [authenticate], all);
 
 async function all(req, res) {
     console.log('posts/');
-    
+
     try {
         let posts = await PostService.getPosts(req.user);
         return res.status(200).json(posts);
@@ -38,14 +37,14 @@ async function post_comments(req, res) {
         let comments = await CommentService.postComments(value);
         return res.status(200).json(comments);
     } catch (e) {
-        if (e instanceof ValidationError){
+        if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
 
-router.post('/create', [authenticate, upload.single('image')], create);
+router.post('/create', [authenticate, upload.single('image'), handleMulterException], create);
 
 async function create(req, res) {
     console.log('posts/create');
@@ -55,6 +54,7 @@ async function create(req, res) {
     });
 
     try {
+
         const current_user = req.user;
         const post_details = req.body;
         const post_file = req.file;
@@ -64,10 +64,10 @@ async function create(req, res) {
 
         let post = await PostService.createPost(value, current_user);
 
-        if (post_file){
+        if (post_file) {
             post = await FileService.SavePostImage(post, post_file);
         }
-        
+
         return res.status(201).json(post);
 
     } catch (e) {
@@ -86,7 +86,7 @@ async function del(req, res) {
     const schema = Joi.object().keys({
         _id: Joi.string().alphanum().length(24).required()
     });
-    
+
     try {
         const post = req.body;
         const current_user = req.user;
@@ -96,12 +96,12 @@ async function del(req, res) {
 
         await PostService.delPost(value, current_user);
         return res.status(200).send();
-    } catch(e) {
+    } catch (e) {
         if (e instanceof NotFoundError) {
-            return res.status(404).json({message: e.message });
+            return res.status(404).json({ message: e.message });
         }
         if (e instanceof AuthorizationError) {
-            return res.status(403).json({message: e.message });
+            return res.status(403).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });
     }
@@ -109,7 +109,7 @@ async function del(req, res) {
 
 router.get('/:_id/likes', [authenticate], likes);
 
-async function likes (req, res) {
+async function likes(req, res) {
     console.log('posts/:_id/likes')
 
     const schema = Joi.string().length(24);
@@ -124,7 +124,7 @@ async function likes (req, res) {
         let likes = await LikeService.getPostLikes(value, current_user);
         return res.status(200).json(likes);
     } catch (e) {
-        if (e instanceof ValidationError){
+        if (e instanceof ValidationError) {
             return res.status(400).json({ message: e.message });
         }
         return res.status(500).json({ message: 'Unknown error' });

@@ -1,15 +1,14 @@
 const { ConflictError, ValidationError, NotFoundError, AuthError } = require('../../models/errors');
+const { upload, handleMulterException } = require('../../multer');
 const { authenticate, authorize } = require('../../middleware');
 const FileService = require('../../services/file.service')
 const AuthService = require('../../services/auth.service')
-const upload = require('../../multer')
 const router = require('express').Router();
 const Joi = require('joi');
 
 module.exports = router
 
-
-router.post('/signup', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), signup);
+router.post('/signup', [upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), handleMulterException], signup);
 
 async function signup(req, res) {
     console.log('auth/signup');
@@ -53,7 +52,7 @@ async function signup(req, res) {
         if (e instanceof ConflictError) {
             return res.status(409).json({ message: e.message }); // right code?
         }
-
+        
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
