@@ -19,7 +19,7 @@ async function signup(req, res) {
         email: Joi.string().email().required(),
         pass: Joi.string().min(5).max(16).alphanum().required(),
         bio: Joi.string().max(200).default(''),
-        username: Joi.string().pattern(/^(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/)
+        username: Joi.string().pattern(/^(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$/)
     });
 
     try {
