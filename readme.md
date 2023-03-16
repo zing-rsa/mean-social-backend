@@ -1,32 +1,29 @@
 
 ## Mern-social-backend
 
-Social-media model to practice full stack application design. Implements MERN stack, and demonstrates functionality such as user authentication, sensitive data storage, profile management, user interactions and admin tools. 
+Mern Social is a code project that aims to simulate a social media similar to Twitter, where users can create accounts, log in, and post short messages + media to share with others. Users can also follow and unfollow each other, as well as like and reply to posts.
+The primary purpose of this project is to explore the JavaScript(MERN) ecosystem and improve my skills in React and API design.
+Thanks for checking it out.
+
+Live on Render [here.](https://mern-social-frontend-mxim.onrender.com/) (slow, especially on cold boot)  
+
+### Debug
+
+1. `npm install`
+2. populate a `.env` with fields from `.sample-env`  
+3. setup a google drive directory:  
+    a. create a google service account by following [this](https://www.labnol.org/google-api-service-account-220404) until step 4  
+    b. save `filekey.json` from the above step in the project root  
+    c. create 3 directories in the drive and add their ID's' to `.env`  
+4. setup a mongoDb instance and add the connection string to `.env`  
+5. create 2 secrets to use as the JWT keys in `.env`
+6. `npm run start`
+
+### Contributing
+
+1. Branch `dev`
+2. use `feature/` `change/` `defect/`
+3. PR to `dev`
 
 ---
-
-Design approach in: [design.md](https://github.com/zing-rsa/mern-social-backend/blob/master/design.md)
-
 Front-end at: [mern-social-frontend](https://github.com/zing-rsa/mern-social-frontend)
-
----
-
-
-## Feature ideas:
-
-### To do:
-
-- Image upload for posts
-- Image upload for profile
-- likes
-- post suggestion algorithm based on following
-- load balanced, scalable backend
-- UI design
-
-
-### Done:
-
-- comments
-- posts
-- user profiles
-
