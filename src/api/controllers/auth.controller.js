@@ -110,6 +110,9 @@ async function refresh(req, res) {
         if (e instanceof AuthError) {
             return res.status(401).json({ message: e.message });
         }
+        if (e instanceof NotFoundError) {
+            return res.status(404).json({ message: e.message });
+        }
         return res.status(500).json({ message: 'Unknown error' });
     }
 }
@@ -119,7 +122,6 @@ router.get('/logout', [authenticate], logout)
 
 async function logout(req, res){
     try {
-        // res.clearCookie('refresh_token');
         res.setHeader('set-cookie', 'refresh_token=; max-age=0');
         return res.status(200).send();
     } catch (e) {

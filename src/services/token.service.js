@@ -1,12 +1,12 @@
-const jwt = require('jsonwebtoken')
-const config = require('../config')
+const jwt = require('jsonwebtoken');
+const config = require('../config');
 
 const getAccessToken = (user) => {
     return jwt.sign(
         { _id: user },
         config.jwt_access_secret,
         {
-            expiresIn: '30m',
+            expiresIn: 30 * 60,
         }
     );
 }
@@ -16,7 +16,7 @@ const getRefreshToken = (user) => {
         { _id: user },
         config.jwt_refresh_secret,
         {
-            expiresIn: '1d',
+            expiresIn: 24 * 60 * 60,
         }
     );
 }
