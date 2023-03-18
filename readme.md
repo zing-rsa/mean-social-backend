@@ -5,7 +5,7 @@ Mern Social is a code project that aims to simulate a social media similar to Tw
 The primary purpose of this project is to explore the JavaScript(MERN) ecosystem and improve my skills in React and API design.
 Thanks for checking it out.
 
-Live on Render [here.](https://mern-social-frontend-mxim.onrender.com/) (slow, especially on cold boot)  
+Live [here.](https://mern-social-frontend-mxim.onrender.com/)  
 
 ### Debug
 
@@ -15,7 +15,7 @@ Live on Render [here.](https://mern-social-frontend-mxim.onrender.com/) (slow, e
     a. create a google service account by following [this](https://www.labnol.org/google-api-service-account-220404) until step 4  
     b. save `filekey.json` from the above step in the project root  
     c. create 3 directories in the drive and add their ID's' to `.env`  
-4. setup a mongoDb instance and add the connection string to `.env`  
+4. setup a mongoDb instance and add the connection string + name to `.env`  
 5. create 2 secrets to use as the JWT keys in `.env`
 6. `npm run start`
 
