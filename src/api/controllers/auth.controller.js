@@ -17,9 +17,9 @@ async function signup(req, res) {
         name: Joi.string().min(1).pattern(/^[a-zA-Z]+$/).required(),
         surname: Joi.string().min(1).pattern(/^[a-zA-Z]+$/).required(),
         email: Joi.string().email().required(),
-        pass: Joi.string().min(5).max(16).alphanum().required(),
+        pass: Joi.string().min(5).max(16).required(),
         bio: Joi.string().max(200).default(''),
-        username: Joi.string().pattern(/^(?=.{4,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$/)
+        username: Joi.string().min(3).max(20).pattern(/^(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._-]+(?<![_.])$/)
     });
 
     try {
