@@ -122,7 +122,7 @@ router.get('/logout', [authenticate], logout)
 
 async function logout(req, res){
     try {
-        res.setHeader('set-cookie', 'refresh_token=; max-age=0');
+        res.setHeader('set-cookie', 'refresh_token=; max-age=0; SameSite=None');
         return res.status(200).send();
     } catch (e) {
         return res.status(500).json({ message: 'Unknown error' });
