@@ -1,6 +1,6 @@
 const { NotFoundError, AuthorizationError, ConflictError } = require('../models/errors');
 const { deleteNotifications } = require('./notification.service');
-const { User, UserMapper } = require('../models/user');
+const { UserEditMapper } = require('../models/user');
 const { ObjectId } = require('mongodb');
 const db = require('../mongo').db();
 
@@ -81,7 +81,7 @@ const editUser = async (user_creds, current_user) => {
         throw new AuthorizationError("Action not permitted");
     }
 
-    let updated_user = new UserMapper(user_creds);
+    let updated_user = new UserEditMapper(user_creds);
     await users.updateOne(id_query, { $set: updated_user });
 
     const { pass, roles, ...output_user } = await users.findOne(id_query)
