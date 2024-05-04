@@ -1,5 +1,3 @@
-//require('dotenv').config()
-
 config = module.exports
 
 config.env = process.env.EXPRESS_ENV || 'dev';
@@ -30,3 +28,10 @@ config.cors = {
   origins: ["https://www.mern-social.zing-rsa.co.za","https://mern-social-frontend-mxim.onrender.com","http://localhost:3000"],
   default: "https://www.mern-social.zing-rsa.co.za"
 }
+
+config.aws_access_key_id = process.env.AWS_ACCESS_KEY_ID
+config.aws_secret_key = process.env.AWS_SECRET_KEY
+config.aws_region = process.env.AWS_REGION
+config.aws_media_bucket_name = process.env.AWS_MEDIA_BUCKET_NAME
+
+config.s3_url = (bucket, key) => `https://${bucket}.s3.amazonaws.com/${key}`;
